@@ -12,6 +12,7 @@ FUNCTION_BLOCK Testblock
 
     IF number_of_boxes > 1 THEN
         cabinet := green;
-    END_IF
+    END_IF;
+
 END_FUNCTION_BLOCK
 

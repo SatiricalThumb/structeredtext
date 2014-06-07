@@ -1,5 +1,6 @@
 grammar StructuredText;
 
+
 fragment LETTER : ('a'..'z' | 'A'..'Z');
 fragment DIGIT : '0'..'9';
 fragment HEX_DIGIT : DIGIT | 'A'..'F';
@@ -17,7 +18,7 @@ REAL_LITERAL: [+-]? FIXED_POINT ([eE] DIGIT+)?;
 
 
 REALH:'REALH';
-LREALH:'LREALH';
+LREALH:'REALH';
 RETURN:'RETURN';
 COMMA:',';
 ARROW_RIGHT : '=>';
@@ -126,7 +127,7 @@ FUNCTION_BLOCK:'FUNCTION_BLOCK';
 END_PROGRAM:'END_PROGRAM';
 RIGHT_ARROW:'RIGHT_ARROW';
 END_STRUCT:'END_STRUCT';
-END_IF:'';
+END_IF:'END_IF';
 VAR_TEMP:'VAR_TEMP';
 COLON:':';
 
