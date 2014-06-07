@@ -62,6 +62,12 @@
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>4.2.2</version>
+
+                <configuration>
+                    <atn>true</atn>
+                    <visitor>true</visitor>
+                </configuration>
+
                 <executions>
                     <execution>
                         <id>antlr</id>

@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.TestRig;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -29,7 +30,7 @@ import edu.kit.iti.structuredtext.antlr.StructuredTextParser;
 public class GrammarTest {
 
     @Test
-    public void test() throws IOException, JDOMException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void test() throws Exception {
         SAXBuilder builder = new SAXBuilder();
         Document document = (Document) builder.build(
                 getClass().getResourceAsStream("StructuredText_01.gunit.xml")
@@ -43,9 +44,9 @@ public class GrammarTest {
             String rule = parser.getAttributeValue("rule");
 
             if (multiline) {
-                test_line_parser(parser.getTextNormalize().trim(), rule);
+                test_line_parser(parser.getTextTrim(), rule);
             } else {
-                for (String line : parser.getTextNormalize().trim().split("\n")) {
+                for (String line : parser.getTextTrim().split("\n")) {
                     test_line_parser(line, rule);
                 }
             }
@@ -73,7 +74,13 @@ public class GrammarTest {
         }
     }
 
-    private void test_line_parser(String tmp, String rule) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+
+
+    private void test_line_parser(String tmp, String rule) throws Exception {
+        System.out.println("==================================================");
+        System.out.println(tmp);
+
         StructuredTextLexer stl = new StructuredTextLexer(new ANTLRInputStream(
                 tmp));
         CommonTokenStream cts = new CommonTokenStream(stl);
@@ -83,8 +90,15 @@ public class GrammarTest {
         stp.setBuildParseTree(true);
         Class<?> clazz = stp.getClass();
         Method method = clazz.getMethod(rule);
-        System.out.println(tmp);
         method.invoke(stp);
-        assertEquals(0, stp.getNumberOfSyntaxErrors());
+
+        if(stp.getNumberOfSyntaxErrors()!=0){
+           MyTestRig mtr = new MyTestRig(tmp, rule);
+        }
+        System.out.flush();
+        System.err.flush();
+        System.out.println("==================================================");
+
+
     }
 }

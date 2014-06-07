@@ -2,7 +2,7 @@
     <parser rule="statement">
         IF a THEN b:=1; END_IF
         IF a THEN b:=1; ELSE b:=1; END_IF
-        IF a THEN b:=1; ELSEIF b:=1; THEN c:=1; END_IF
+        IF a THEN b:=1; ELSEIF b THEN c:=1; END_IF
     </parser>
 
     <parser rule="expression">
