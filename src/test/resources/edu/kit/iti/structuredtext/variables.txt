@@ -1,0 +1,5 @@
+abc
+def
+abc[2]
+abc[2,3]
+abc.def
