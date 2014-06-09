@@ -1,224 +1,251 @@
 grammar StructuredText;
 
-fragment FIXED_POINT: DIGIT+ (DOT DIGIT+)?;
+fragment
+FIXED_POINT                             : DIGIT+ (DOT DIGIT+)?;
 
-DAY_LITERAL : FIXED_POINT 'd';
-HOURS_LITERAL : FIXED_POINT 'h';
-MINUTES_LITERAL : FIXED_POINT 'm';
-SECONDS_LITERAL : FIXED_POINT 's';
-MILLIESECONDS_LITERAL : FIXED_POINT 'ms';
+fragment
+LETTER                                  : 'a'..'z' | 'A'..'Z';
 
+fragment
+DIGIT                                   : '0'..'9';
 
-fragment LETTER : ('a'..'z' | 'A'..'Z');
-fragment DIGIT : '0'..'9';
-fragment HEX_DIGIT : DIGIT | 'A'..'F';
-fragment OCTAL_DIGIT : '0'..'7';
+fragment
+HEX_DIGIT                               : DIGIT | 'A'..'F';
 
+fragment
+OCTAL_DIGIT                             : '0'..'7';
 
+/******
+ * Literal
+ */
 
 CHARACTER_LITERAL_2BYTE : '$' HEX_DIGIT HEX_DIGIT;
 CHARACTER_LITERAL_4BYTE : '$' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
 
-INTEGER_LITERAL: DIGIT (DIGIT |'_')*;
-OCTAL_LITERAL:   '8#' OCTAL_DIGIT (OCTAL_DIGIT |'_')*;
-BINARY_LITERAL:  '2#' BIT (BIT | '_')*;
-HEX_LITERAL:    '16#' HEX_DIGIT ('_' | HEX_DIGIT)*;
-REAL_LITERAL: [+-]? FIXED_POINT ([eE] DIGIT+)?;
+UINTEGER_LITERAL        : DIGIT (DIGIT |'_')*;
+//SINTEGER_LITERAL        : (PLUS|MINUS) DIGIT (DIGIT |'_')*;
+OCTAL_LITERAL           : '8#' OCTAL_DIGIT (OCTAL_DIGIT |'_')*;
+BINARY_LITERAL          : '2#' BIT (BIT | '_')*;
+HEX_LITERAL             : '16#' HEX_DIGIT ('_' | HEX_DIGIT)*;
+
+REAL_LITERAL            : FIXED_POINT ([eE] DIGIT+)?;
+
+DATE_LIERAL             : UINTEGER_LITERAL MINUS UINTEGER_LITERAL MINUS UINTEGER_LITERAL;
+
+INCOMPL_LOCATION_LITERAL: 'AT%'[IQM]'*';
+
+DAY_LITERAL             : FIXED_POINT 'd';
+HOURS_LITERAL           : FIXED_POINT 'h';
+MINUTES_LITERAL         : FIXED_POINT 'm';
+SECONDS_LITERAL         : FIXED_POINT 's';
+MILLIESECONDS_LITERAL   : FIXED_POINT 'ms';
+
+/******
+ * DATATYPES
+ */
 
 
-REALH:'REALH';
-LREALH:'REALH';
-RETURN:'RETURN';
-COMMA:',';
-ARROW_RIGHT : '=>';
-NOT:'NOT';
-END_CASE:'END_CASE';
-OF:'OF';
-CASE: 'CASE';
-IF: 'IF';
-ELSEIF:'ELSEIF';
-ELSE:'ELSE';
-THEN:'THEN';
-
-//Cast Operators
-BYTEH:'BYTE#';
-BOOLH:'BOOL#';
-WORDH:'WORD#';
-DWORDH:'DWORD#';
-LWORDH:'LWORD#';
-
-WORD:'WORD';
-DWORD:'DWORD';
-LWORD:'LWORD';
-HASH:'#';
-
-TRUE  : 'TRUE';
-FALSE : 'FALSE';
-SQUOTE:'\'';
-DQUOTE:'"';
-DOLLAR:'$';
-T:'T';
-TIME:'TIME';
-STRING  : 'STRING';
-WSTRING : 'WSTRING';
-INT:'INT';
-SINT:'SINT';
-DINT:'DINT';
-LINT:'LINT';
-UINT:'UINT';
-USINT:'USINT';
-UDINT:'UDINT';
-ULINT:'ULINT';
-REAL:'REAL';
-BOOL:'BOOL';
-ANY:'ANY';
-ANY_DERIVED:'ANY_DERIVED';
-ANY_MAGNITUDE:'ANY_MAGNITUDE';
-ANY_ELEMENTARY:'ANY_ELEMENTARY';
-ANY_NUM:'ANY_NUM';
-ANY_REAL:'ANY_REAL';
-ANY_INT:'ANY_INT';
-ANY_BIT:'ANY_BIT';
-ANY_STRING:'ANY_STRING';
-ANY_DATE:'ANY_DATE';
-ARRAY:'ARRAY';
-
-//EXPONENT: [eE];
-MULT:'*';
-DIV:'/';
-MOD:'MOD';
-LPAREN: '(';
-RPAREN: ')';
-
-LBRACKET:'[';
-RBRACKET:']';
-
-SEMICOLON:';';
-POWER:'**';
-ASSIGN:':=';
-FOR:'FOR';
-END_FOR:'END_FOR';
-TO:'TO';
-BY:'BY';
-DO:'DO';
-WHILE:'WHILE';
-END_WHILE:'END_WHILE';
-UNTIL: 'UNTIL';
-END_REPEAT: 'END_REPEAT';
-REPEAT: 'REPEAT';
-EXIT: 'EXIT';
+ANY                     : 'ANY';
+ANY_BIT                 : 'ANY_BIT';
+ANY_DATE                : 'ANY_DATE';
+ANY_DERIVED             : 'ANY_DERIVED';
+ANY_ELEMENTARY          : 'ANY_ELEMENTARY';
+ANY_INT                 : 'ANY_INT';
+ANY_MAGNITUDE           : 'ANY_MAGNITUDE';
+ANY_NUM                 : 'ANY_NUM';
+ANY_REAL                : 'ANY_REAL';
+ANY_STRING              : 'ANY_STRING';
+ARRAY                   : 'ARRAY';
+BOOL                    : 'BOOL';
+BYTE                    : 'BYTE';
+DATE_AND_TIME           : 'DATE_AND_TIME';
+DINT                    : 'DINT';
+DWORD                   : 'DWORD';
+INT                     : 'INT';
+LINT                    : 'LINT';
+LREAL                   : 'LREAL';
+LWORD                   : 'LWORD';
+REAL                    : 'REAL';
+SINT                    : 'SINT';
+STRING                  : 'STRING';
+TIME                    : 'TIME';
+TIME_OF_DAY             : 'TIME_OF_DAY'|'TOD';
+UDINT                   : 'UDINT';
+UINT                    : 'UINT';
+ULINT                   : 'ULINT';
+USINT                   : 'USINT';
+WORD                    : 'WORD';
+WSTRING                 : 'WSTRING';
 
 
-NIL : 'NIL';
-RETAIN : 'RETAIN';
-NON_RETAIN : 'NON_RETAIN';
+/******
+ * region Casts
+ */
 
-BIT : '1' | '0';
-
-
-WS: [ \r\t\n] -> skip;
-
-BYTE: 'BYTE';
-MINUS: '-';
-PLUS : '+';
-
-LESS_THAN:'<';
-GREATER_THAN:'>';
-GREATER_EQUALS:'>=';
-LESS_EQUALS: '<=';
-EQUALS: '=';
-NOT_EQUALS:'<>';
-
-AMPERSAND:'&';
-VAR_OUTPUT:'VAR_OUTPUT';
-VAR_EXTERNAL:'VAR_EXTERNAL';
-FUNCTION_BLOCK:'FUNCTION_BLOCK';
-END_PROGRAM:'END_PROGRAM';
-RIGHT_ARROW:'RIGHT_ARROW';
-END_STRUCT:'END_STRUCT';
-END_IF:'END_IF';
-VAR_TEMP:'VAR_TEMP';
-COLON:':';
-
-DT:'DT';
-LREAL:'LREAL';
-PERCENT:'%';
-PROGRAM: 'PROGRAM';
-OR:'OR';
-AND:'AND';
-XOR:'XOR';
-END_CONFIGURATION:'END_CONFIGURATION';
-
-DATE:'DATE';
-DATEH:'DATE#' | 'D#';
-STRUCT: 'STRUCT';
-DOT: '.';
-WITH:'WITH';
-SINGLE: 'SINGLE';
-END_TYPE:'END_TYPE';
-VAR_INPUT: 'VAR_INPUT';
-VAR_GLOBAL:'VAR_GLOBAL';
-TASK:'TASK';
-TYPE:'TYPE';
-FUNCTION:'FUNCTION';
-DOLLAR_DQUOTE: '$"';
-VAR_IN_OUT:'VAR_IN_OUT';
-END_FUNCTION:'END_FUNCTION';
-END_FUNCTION_BLOCK:'END_FUNCTION_BLOCK';
-INTERVAL:'INTERVAL';
-CONSTANT:'CONSTANT';
-VAR:'VAR';
-VAR_CONFIG:'VAR_CONFIG';
-END_VAR:'END_VAR';
-PRIORITY:'PRIORITY';
-READ_WRITE:'READ_WRITE';
-READ_ONLY:'READ_ONLY';
-VAR_ACCESS:'VAR_ACCESS';
-RANGE: '..';
-END_RESOURCE:'END_RESOURCE';
-CONFIGURATION:'CONFIGURATION';
-RESOURCE:'RESOURCE';
-ON:'ON';
-R_EDGE:'R_EDGE';
-F_EDGE:'F_EDGE';
-AT:'AT';
-I:'I';
-Q:'Q';
-M:'M';
-X:'X';
-B:'B';
-W:'W';
-D:'D';
-L:'L';
-DOLLAR_SQUOTE:'$\'';
-DOLLAR_DOLLAR: '$$';
-DOLLAR_L: '$L';
-DOLLAR_N: '$N';
-DOLLAR_P: '$P';
-DOLLAR_R: '$R';
-DOLLAR_T: '$T';
-DOLLAR_l: '$l';
-DOLLAR_n: '$n';
-DOLLAR_p: '$p';
-DOLLAR_r: '$r';
-DOLLAR_t: '$t';
-UNDERSCORE:'_';
-TIME_OF_DAY:'TIME_OF_DAY#';
-TOD:'TOD#';
-DATE_AND_TIME:'DATE_AND_TIME';
+BOOLH                   : 'BOOL#';
+BYTEH                   : 'BYTE#';
+DWORDH                  : 'DWORD#';
+LREALH                  : 'LREALH';
+REALH                   : 'REALH';
+TIME_OF_DAYH            : 'TIME_OF_DAY'|'TOD' '#';
+TODH                    : 'TOD#';
+TIMEH                   : 'TIME'|'T' '#';
+WORDH                   : 'WORD#';
+DINTH                   : DINT '#';
+INTH                    : INT '#';
+LINTH                   : LINT '#';
+LWORDH                  : LWORD '#';
+SINTH                   : SINT '#';
+UDINTH                  : UDINT '#';
+UINTH                   : UINT '#';
+ULINTH                  : ULINT '#';
+USINTH                  : USINT '#';
+DATE_AND_TIMEH          : 'DATE_AND_TIME'|'DT' '#';
 
 
-IDENTIFIER: [a-zA-Z] [a-zA-Z0-9_]*;
+/******
+ * Keywords
+ */
+
+VAR_OUTPUT               : 'VAR_OUTPUT';
+AT                      : 'AT';
+BY                      : 'BY';
+CASE                    : 'CASE';
+COLON                   : ':';
+CONFIGURATION           : 'CONFIGURATION';
+CONSTANT                : 'CONSTANT';
+DATE                    : 'DATE';
+DATEH                   : 'DATE#' | 'D#';
+DO                      : 'DO';
+DOLLAR_DQUOTE           : '$"';
+DOT                     : '.';
+DT                      : 'DT';
+ELSE                    : 'ELSE';
+ELSEIF                  : 'ELSEIF';
+END_CASE                : 'END_CASE';
+END_CONFIGURATION       : 'END_CONFIGURATION';
+END_FOR                 : 'END_FOR';
+END_FUNCTION            : 'END_FUNCTION';
+END_FUNCTION_BLOCK      : 'END_FUNCTION_BLOCK';
+END_IF                  : 'END_IF';
+END_PROGRAM             : 'END_PROGRAM';
+END_REPEAT              : 'END_REPEAT';
+END_RESOURCE            : 'END_RESOURCE';
+END_STRUCT              : 'END_STRUCT';
+END_TYPE                : 'END_TYPE';
+END_VAR                 : 'END_VAR';
+END_WHILE               : 'END_WHILE';
+EXIT                    : 'EXIT';
+FOR                     : 'FOR';
+FUNCTION                : 'FUNCTION';
+FUNCTION_BLOCK          : 'FUNCTION_BLOCK';
+F_EDGE                  : 'F_EDGE';
+IF                      : 'IF';
+INTERVAL                : 'INTERVAL';
+NIL                     : 'NIL';
+NON_RETAIN              : 'NON_RETAIN';
+OF                      : 'OF';
+ON                      : 'ON';
+PRIORITY                : 'PRIORITY';
+PROGRAM                 : 'PROGRAM';
+RANGE                   :  '..';
+READ_ONLY               : 'READ_ONLY';
+READ_WRITE              : 'READ_WRITE';
+REPEAT                  : 'REPEAT';
+RESOURCE                : 'RESOURCE';
+RETAIN                  : 'RETAIN';
+RETURN                  : 'RETURN';
+RIGHT_ARROW             : 'RIGHT_ARROW';
+R_EDGE                  : 'R_EDGE';
+SINGLE                  : 'SINGLE';
+STRUCT                  : 'STRUCT';
+TASK                    : 'TASK';
+THEN                    : 'THEN';
+TO                      : 'TO';
+TYPE                    : 'TYPE';
+UNTIL                   : 'UNTIL';
+VAR                     : 'VAR';
+VAR_ACCESS              : 'VAR_ACCESS';
+VAR_CONFIG              : 'VAR_CONFIG';
+VAR_EXTERNAL            : 'VAR_EXTERNAL';
+VAR_GLOBAL              : 'VAR_GLOBAL';
+VAR_INPUT               : 'VAR_INPUT';
+VAR_IN_OUT              : 'VAR_IN_OUT';
+VAR_TEMP                : 'VAR_TEMP';
+WHILE                   : 'WHILE';
+WITH                    : 'WITH';
+
+
+/******
+ * Operators
+ */
+
+AND                     :'AND';
+ARROW_RIGHT             : '=>';
+ASSIGN                  :':=';
+COMMA                   : ',';
+DIV                     :'/';
+EQUALS                  : '=';
+GREATER_EQUALS          :'>=';
+GREATER_THAN            :'>';
+LBRACKET                :'[';
+LESS_EQUALS             : '<=';
+LESS_THAN               :'<';
+LPAREN                  : '(';
+MINUS                   : '-';
+MOD                     :'MOD';
+MULT                    :'*';
+NOT                     : 'NOT';
+NOT_EQUALS              :'<>';
+OR                      :'OR';
+PLUS                    : '+';
+POWER                   :'**';
+RBRACKET                :']';
+RPAREN                  : ')';
+XOR                     :'XOR';
+
+
+/*******
+ * Constants
+ */
+
+AMPERSAND               :'&';
+BIT                     : '1' | '0';
+DOLLAR                  :'$';
+DQUOTE                  :'"';
+FALSE                   : 'FALSE';
+SEMICOLON               :';';
+SQUOTE                  :'\'';
+TRUE                    : 'TRUE';
+UNDERSCORE              :'_';
+WS                      : [ \r\t\n] -> skip;
+
+//PERCENT               :'%';
+DOLLAR_SQUOTE           :'$\'';
+DOLLAR_DOLLAR           : '$$';
+DOLLAR_L                : '$L';
+DOLLAR_N                : '$N';
+DOLLAR_P                : '$P';
+DOLLAR_R                : '$R';
+DOLLAR_T                : '$T';
+DOLLAR_l                : '$l';
+DOLLAR_n                : '$n';
+DOLLAR_p                : '$p';
+DOLLAR_r                : '$r';
+DOLLAR_t                : '$t';
+
+
+IDENTIFIER              : [a-zA-Z] [a-zA-Z0-9_]*;
+CAST                    : IDENTIFIER '#';
+
+/************************************************/
 
 start : library_element_declaration+;
 
 library_element_name    
     : data_type_name
-    | function_name
     | function_block_type_name
-    | program_type_name
-    | resource_type_name
-    | configuration_name
+    | IDENTIFIER
     ;
 
 library_element_declaration 
@@ -244,47 +271,47 @@ numeric_literal
     ;
 
 integer_literal 
-    : (integer_type_name HASH)
-      ( signed_integer
-      | binary_integer
-      | octal_integer
-      | hex_integer )
+    : integer_type_cast?
+      ( UINTEGER_LITERAL
+      | BINARY_LITERAL
+      | OCTAL_LITERAL
+      | HEX_LITERAL)
     ;
 
-unsigned_integer 
-    : (PLUS | MINUS)? INTEGER_LITERAL
+integer_type_cast
+    : signed_integer_type_cast
+    | unsigned_integer_type_cast
     ;
 
-signed_integer 
-    : (PLUS | MINUS)? INTEGER_LITERAL
+signed_integer_type_cast
+    : SINTH
+    | INTH
+    | DINTH
+    | LINTH
     ;
 
-integer 
-    : INTEGER_LITERAL
+unsigned_integer_type_cast
+    : USINTH
+    | UINTH
+    | UDINTH
+    | ULINTH
     ;
 
-binary_integer 
-    : BINARY_LITERAL
-    ;
-
-octal_integer 
-    : OCTAL_LITERAL
-    ;
-
-hex_integer 
-    : HEX_LITERAL
+integer
+    : UINTEGER_LITERAL
+    | MINUS UINTEGER_LITERAL
     ;
 
 real_literal 
-    : real_type_name? REAL_LITERAL
+    : real_type_cast? MINUS? REAL_LITERAL
     ;
 
 bit_string_literal
     : (BYTEH | WORDH | DWORDH | LWORDH)?
-      ( unsigned_integer
-      | binary_integer 
-      | octal_integer 
-      | hex_integer )
+      ( UINTEGER_LITERAL
+      | BINARY_LITERAL
+      | OCTAL_LITERAL
+      | HEX_LITERAL )
     ;
 
 boolean_literal     
@@ -341,7 +368,7 @@ time_literal
     ;
 
 duration 
-    : (T | TIME ) HASH (MINUS)? interval
+    : TIMEH (MINUS)? interval
     ;
 
 interval 
@@ -374,47 +401,23 @@ milliseconds
     ;
 
 time_of_day 
-    : (TIME_OF_DAY | TOD) daytime
+    : TIME_OF_DAYH daytime
     ;
 
 daytime 
-    : day_hour COLON day_minute COLON day_second
-    ;
-
-day_hour 
-    : integer
-    ;
-
-day_minute 
-    : integer
-    ;
-
-day_second 
-    : integer
+    : integer COLON integer COLON integer
     ;
 
 date 
-    : (DATEH|DH) date_literal
+    : DATEH date_literal
     ;
 
 date_literal 
-    : year MINUS month MINUS day
-    ;
-
-year 
-    : integer
-    ;
-
-month 
-    : integer
-    ;
-
-day 
-    : integer
+    : integer MINUS integer MINUS integer
     ;
 
 date_and_time 
-    : (DATE_AND_TIME | DT) HASH date_literal MINUS daytime
+    : DATE_AND_TIMEH date_literal MINUS daytime
     ;
 
 data_type_name 
@@ -423,7 +426,7 @@ data_type_name
 
 non_generic_type_name 
     : elementary_type_name
-    | derived_type_name
+    | IDENTIFIER
     ;
 
 elementary_type_name
@@ -435,8 +438,15 @@ elementary_type_name
     | TIME
     ;
 
-numeric_type_name : integer_type_name | real_type_name;
-integer_type_name : signed_integer_type_name | unsigned_integer_type_name;
+numeric_type_name
+    : integer_type_name
+    | real_type_name
+    ;
+
+integer_type_name
+    : signed_integer_type_name
+    | unsigned_integer_type_name
+    ;
 
 signed_integer_type_name 
     : SINT
@@ -452,8 +462,12 @@ unsigned_integer_type_name
     | ULINT
     ;
 
-
 real_type_name
+    : REAL
+    | LREAL
+    ;
+
+real_type_cast
     : REALH
     | LREALH
     ;
@@ -461,7 +475,6 @@ real_type_name
 date_type_name  
     : DATE
     | TIME_OF_DAY
-    | TOD
     | DATE_AND_TIME
     | DT
     ;
@@ -487,38 +500,6 @@ generic_type_name
     | ANY_DATE
     ;
 
-derived_type_name   
-    : single_element_type_name
-    | array_type_name
-    | structure_type_name
-    | string_type_name
-    ;
-
-single_element_type_name    
-    : simple_type_name
-    | subrange_type_name
-    | enumerated_type_name
-    ;
-
-simple_type_name        
-    : IDENTIFIER
-    ;
-subrange_type_name      
-    : IDENTIFIER
-    ;
-
-enumerated_type_name    
-    : IDENTIFIER
-    ;
-
-array_type_name         
-    : IDENTIFIER
-    ;
-
-structure_type_name     
-    : IDENTIFIER
-    ;
-
 data_type_declaration   
     : TYPE type_declaration SEMICOLON
         (type_declaration SEMICOLON)* 
@@ -539,7 +520,7 @@ single_element_type_declaration
     ;
 
 simple_type_declaration 
-    : simple_type_name COLON simple_spec_init
+    : IDENTIFIER COLON simple_spec_init
     ;
 
 simple_spec_init 
@@ -548,28 +529,28 @@ simple_spec_init
 
 simple_specification 
     : elementary_type_name 
-    | simple_type_name
+    |IDENTIFIER
     ;
 
 subrange_type_declaration 
-    : subrange_type_name COLON subrange_spec_init
+    :IDENTIFIER COLON subrange_spec_init
     ;
 
 subrange_spec_init 
-    : subrange_specification(ASSIGN signed_integer)?
+    : subrange_specification(ASSIGN integer)?
     ;
 
 subrange_specification 
     : integer_type_name LPAREN subrange RPAREN 
-    | subrange_type_name
+    |IDENTIFIER
     ;
 
 subrange 
-    : signed_integer RANGE  signed_integer
+    : integer RANGE  integer
     ;
 
 enumerated_type_declaration 
-    : enumerated_type_name COLON enumerated_spec_init
+    :IDENTIFIER COLON enumerated_spec_init
     ;
 
 enumerated_spec_init 
@@ -578,15 +559,15 @@ enumerated_spec_init
 
 enumerated_specification 
     : (LPAREN enumerated_value (COMMA enumerated_value)* RPAREN)
-    | enumerated_type_name
+    | IDENTIFIER
     ;
 
 enumerated_value 
-    : (enumerated_type_name HASH)? IDENTIFIER
+    : CAST IDENTIFIER
     ;
 
 array_type_declaration 
-    : array_type_name COLON array_spec_init
+    :IDENTIFIER COLON array_spec_init
     ;
 
 array_spec_init 
@@ -594,7 +575,7 @@ array_spec_init
     ;
 
 array_specification 
-    : array_type_name
+    :IDENTIFIER
     | ARRAY LBRACKET subrange (COMMA subrange)* RBRACKET
         OF non_generic_type_name
     ;
@@ -617,7 +598,7 @@ array_initial_element
     ;
 
 structure_type_declaration 
-    : structure_type_name COLON structure_specification
+    :IDENTIFIER COLON structure_specification
     ;
 
 structure_specification
@@ -626,7 +607,7 @@ structure_specification
     ;
 
 initialized_structure 
-    : structure_type_name (ASSIGN structure_initialization)?
+    :IDENTIFIER (ASSIGN structure_initialization)?
     ;
 
 structure_declaration 
@@ -636,7 +617,7 @@ structure_declaration
     ;
 
 structure_element_declaration 
-    : structure_element_name COLON
+    :IDENTIFIER COLON
         ( simple_spec_init
         | subrange_spec_init
         | enumerated_spec_init
@@ -644,9 +625,6 @@ structure_element_declaration
         | initialized_structure)
     ;    
 
-structure_element_name 
-    : IDENTIFIER
-    ;
 
 structure_initialization 
     : LPAREN structure_element_initialization
@@ -654,19 +632,16 @@ structure_initialization
     ;
 
 structure_element_initialization 
-    : structure_element_name ASSIGN
+    :IDENTIFIER ASSIGN
         ( constant
         | enumerated_value
         | array_initialization
         | structure_initialization )
     ;
 
-string_type_name 
-    : IDENTIFIER
-    ;
 
 string_type_declaration 
-    : string_type_name COLON 
+    :IDENTIFIER COLON
       (STRING|WSTRING) 
       ( LBRACKET integer RBRACKET)?
       (ASSIGN character_string)?
@@ -678,44 +653,20 @@ variable
     ;
 
 symbolic_variable 
-    : variable_name subscript_list?
-      ( DOT symbolic_variable)?
+    : IDENTIFIER subscript_list? ( DOT symbolic_variable)?
     ;
 
-variable_name 
-    : IDENTIFIER
+subscript_list
+    : LBRACKET expression (COMMA expression)* RBRACKET
     ;
+
 
 direct_variable 
-    : PERCENT location_prefix size_prefix integer (DOT integer)*
+    : DIRECT_VARIABLE_LITERAL
     ;
 
-location_prefix 
-    : I 
-    | Q 
-    | M
-    ;
+DIRECT_VARIABLE_LITERAL: '%' [IQM] [XBWDL]? FIXED_POINT;
 
-size_prefix 
-    : NIL /* maybe wrong, paper unclear */
-    | X 
-    | B 
-    | W 
-    | D 
-    | L
-    ;
-
-subscript_list 
-    : LBRACKET subscript (COMMA subscript)* RBRACKET
-    ;
-
-subscript 
-    : expression
-    ;
-
-field_selector 
-    : IDENTIFIER
-    ;
 
 input_declarations 
     : VAR_INPUT (RETAIN | NON_RETAIN)? 
@@ -729,7 +680,7 @@ input_declaration
     ;
 
 edge_declaration 
-    : var1_list COLON BOOL (R_EDGE | F_EDGE)
+    : identifier_list COLON BOOL (R_EDGE | F_EDGE)
     ;
 
 var_init_decl 
@@ -741,34 +692,22 @@ var_init_decl
     ;
 
 var1_init_decl 
-    : var1_list COLON ( simple_spec_init 
+    : identifier_list COLON ( simple_spec_init 
                       | subrange_spec_init 
                       | enumerated_spec_init)
     ;
 
-var1_list 
-    : variable_name (COMMA variable_name)*
-    ;
-
 array_var_init_decl 
-    : var1_list COLON array_spec_init
+    : identifier_list COLON array_spec_init
     ;
 
 structured_var_init_decl 
-    : var1_list COLON initialized_structure
+    : identifier_list COLON initialized_structure
     ;
 
 fb_name_decl 
-    : fb_name_list COLON function_block_type_name 
+    : identifier_list COLON function_block_type_name 
       ( ASSIGN structure_initialization )?
-    ;
-
-fb_name_list 
-    : fb_name (COMMA fb_name)*
-    ;
-
-fb_name
-    : IDENTIFIER
     ;
 
 output_declarations 
@@ -796,17 +735,17 @@ temp_var_decl
     ;
 
 var1_declaration 
-    : var1_list COLON ( simple_specification 
+    : identifier_list COLON ( simple_specification 
                       | subrange_specification 
                       | enumerated_specification)
     ;
 
 array_var_declaration 
-    : var1_list COLON array_specification
+    : identifier_list COLON array_specification
     ;
 
 structured_var_declaration 
-    : var1_list COLON structure_type_name
+    : identifier_list COLON IDENTIFIER
     ;
 
 var_declarations 
@@ -825,7 +764,7 @@ located_var_declarations
       END_VAR
     ;
 
-located_var_decl : (variable_name)? location COLON located_var_spec_init;
+located_var_decl : (IDENTIFIER)? location COLON located_var_spec_init;
 
 external_var_declarations 
     : VAR_EXTERNAL CONSTANT? external_declaration SEMICOLON 
@@ -834,19 +773,16 @@ external_var_declarations
     ;
 
 external_declaration 
-    : global_var_name COLON 
+    :IDENTIFIER COLON
       ( simple_specification 
       | subrange_specification
       | enumerated_specification 
       | array_specification 
-      | structure_type_name 
+      |IDENTIFIER
       | function_block_type_name
       )
     ;
 
-global_var_name 
-    : IDENTIFIER
-    ;
 
 global_var_declarations 
     : VAR_GLOBAL (CONSTANT | RETAIN)? global_var_decl SEMICOLON 
@@ -860,8 +796,8 @@ global_var_decl
     ;
 
 global_var_spec 
-    : global_var_list 
-    | (global_var_name)? location
+    : identifier_list 
+    | (IDENTIFIER)? location
     ;
 
 located_var_spec_init   
@@ -878,8 +814,8 @@ location
     : AT direct_variable
     ;
 
-global_var_list 
-    : global_var_name (COMMA global_var_name)*
+identifier_list
+    : IDENTIFIER (COMMA IDENTIFIER)*
     ;
 
 string_var_declaration 
@@ -888,7 +824,7 @@ string_var_declaration
     ;
 
 single_byte_string_var_declaration 
-    : var1_list COLON single_byte_string_spec
+    : identifier_list COLON single_byte_string_spec
     ;
 
 single_byte_string_spec 
@@ -897,7 +833,7 @@ single_byte_string_spec
     ;
 
 double_byte_string_var_declaration 
-    : var1_list COLON double_byte_string_spec
+    : identifier_list COLON double_byte_string_spec
     ;
 
 double_byte_string_spec 
@@ -913,11 +849,7 @@ incompl_located_var_declarations
     ;
 
 incompl_located_var_decl 
-    : variable_name incompl_location COLON var_spec
-    ;
-
-incompl_location 
-    : AT PERCENT (I | Q | M ) MULT
+    :IDENTIFIER INCOMPL_LOCATION_LITERAL COLON var_spec
     ;
 
 var_spec 
@@ -925,27 +857,15 @@ var_spec
     | subrange_specification 
     | enumerated_specification 
     | array_specification 
-    | structure_type_name 
-    | (STRING | WSTRING) ( LBRACKET integer RBRACKET)? 
-    ;
-
-function_name 
-    : standard_function_name 
-    | derived_function_name
-    ;
-
-standard_function_name 
-    : IDENTIFIER /*<as defined in clause 2.5.1.5 of the standard>*/
-    ;
-
-derived_function_name 
-    : IDENTIFIER
+    | IDENTIFIER
+    | (STRING | WSTRING) (LBRACKET integer RBRACKET)?
     ;
 
 function_declaration 
-    : FUNCTION derived_function_name COLON
-        (elementary_type_name | derived_type_name)
-        ( io_var_declarations | function_var_decls )* function_body
+    : FUNCTION IDENTIFIER COLON
+        (elementary_type_name | IDENTIFIER)
+        (io_var_declarations | function_var_decls )*
+        function_body
       END_FUNCTION
     ;
      
@@ -978,22 +898,14 @@ var2_init_decl
     ;
 
 function_block_type_name 
-    : standard_function_block_name
-    | derived_function_block_name
-    ;
-
-standard_function_block_name 
-    : IDENTIFIER /* <as defined in clause 2.5.2.3 of the standard>*/
-    ;
-
-derived_function_block_name 
-    : IDENTIFIER
+    :IDENTIFIER
+    |IDENTIFIER
     ;
 
 function_block_declaration 
-    : FUNCTION_BLOCK derived_function_block_name
+    : FUNCTION_BLOCK name=IDENTIFIER
       ( io_var_declarations | other_var_declarations )*
-                                function_block_body
+      body=function_block_body
       END_FUNCTION_BLOCK
     ;
 
@@ -1029,12 +941,9 @@ function_block_body
 | statement_list
 /*| <other languages>
 ;*/
-program_type_name 
-    : IDENTIFIER
-    ;
 
 program_declaration     
-    : PROGRAM program_type_name
+    : PROGRAM name=IDENTIFIER
       ( io_var_declarations
       | other_var_declarations
       | located_var_declarations
@@ -1052,20 +961,12 @@ program_access_decls
     ;
 
 program_access_decl 
-    : access_name COLON symbolic_variable COLON 
+    :IDENTIFIER COLON symbolic_variable COLON
         non_generic_type_name (direction)?
     ;
 
-configuration_name 
-    : IDENTIFIER
-    ;
-
-resource_type_name 
-    : IDENTIFIER
-    ;
-
 configuration_declaration 
-    : CONFIGURATION configuration_name
+    : CONFIGURATION name=IDENTIFIER
         (global_var_declarations)?
         ( single_resource_declaration
         | (resource_declaration (resource_declaration)*)
@@ -1076,7 +977,7 @@ configuration_declaration
     ;
 
 resource_declaration 
-    : RESOURCE resource_name ON resource_type_name
+    : RESOURCE IDENTIFIER ON IDENTIFIER
       (global_var_declarations)?
       single_resource_declaration
       END_RESOURCE
@@ -1088,10 +989,6 @@ single_resource_declaration
       (program_configuration SEMICOLON)*
     ;
 
-resource_name 
-    : IDENTIFIER
-    ;
-
 access_declarations 
     : VAR_ACCESS
       access_declaration SEMICOLON
@@ -1100,29 +997,22 @@ access_declarations
     ;
 
 access_declaration 
-    : access_name COLON access_path COLON
+    :IDENTIFIER COLON access_path COLON
       non_generic_type_name (direction)?;
 
 access_path 
-    : (resource_name DOT )? direct_variable
-    | (resource_name DOT)? (program_name DOT)?
-      (fb_name DOT)* symbolic_variable;
+    : (IDENTIFIER DOT)? direct_variable
+    | (IDENTIFIER DOT)* symbolic_variable
+    ;
 
 global_var_reference 
-    : (resource_name DOT)? 
-      global_var_name (DOT structure_element_name)?
-    ;
-access_name 
-    : IDENTIFIER
+    : (IDENTIFIER DOT)? IDENTIFIER (DOT IDENTIFIER)?
     ;
 
 program_output_reference 
-    : program_name DOT symbolic_variable
+    : IDENTIFIER DOT symbolic_variable
     ;
 
-program_name 
-    : IDENTIFIER
-    ;
 
 direction 
     : READ_WRITE 
@@ -1130,12 +1020,9 @@ direction
     ;
 
 task_configuration 
-    : TASK task_name task_initialization
+    : TASK IDENTIFIER task_initialization
     ;
 
-task_name 
-    : IDENTIFIER
-    ;
 
 task_initialization 
     : LPAREN (SINGLE ASSIGN data_source COMMA)?
@@ -1153,7 +1040,7 @@ data_source
 
 program_configuration   
     : PROGRAM (RETAIN | NON_RETAIN)?
-        program_name (WITH task_name)? COLON program_type_name
+        IDENTIFIER (WITH IDENTIFIER)? COLON IDENTIFIER
         ( LPAREN prog_conf_elements RPAREN)?
     ;
 
@@ -1167,7 +1054,7 @@ prog_conf_element
     ;
 
 fb_task 
-    : fb_name WITH task_name
+    : IDENTIFIER WITH IDENTIFIER
     ;
 
 prog_cnxn 
@@ -1195,30 +1082,27 @@ instance_specific_initializations
     ;
 
 instance_specific_init 
-    : resource_name DOT program_name DOT (fb_name DOT)*
-      ((variable_name (location)? COLON located_var_spec_init) |
-                (fb_name COLON function_block_type_name ASSIGN
+    : IDENTIFIER DOT IDENTIFIER DOT (IDENTIFIER DOT)*
+      ((IDENTIFIER (location)? COLON located_var_spec_init) |
+                (IDENTIFIER COLON function_block_type_name ASSIGN
                    structure_initialization))
     ;
 
-expression 
-    : xor_expression (OR xor_expression)*
-    ;
 
-xor_expression 
-    : and_expression (XOR and_expression)*
-    ;
-
-and_expression 
-    : comparison ((AMPERSAND | AND) comparison)*
-    ;
-
-comparison 
-    : equ_expression ( (EQUALS | NOT_EQUALS) equ_expression)*
-    ;
-
-equ_expression 
-    : add_expression (comparison_operator add_expression)*
+expression
+    : unary_operator expression
+    | LPAREN expression RPAREN
+    | expression POWER expression
+    |<assoc=right>
+      expression (MOD|DIV) expression
+    | expression (MULT) expression
+    | expression (PLUS|MINUS) expression
+    | expression comparison_operator expression
+    | expression (EQUALS | NOT_EQUALS) expression
+    | expression AND expression
+    | expression OR expression
+    | expression XOR expression
+    | primary_expression
     ;
 
 comparison_operator 
@@ -1228,34 +1112,8 @@ comparison_operator
     | LESS_EQUALS
     ;
 
-add_expression 
-    : term (add_operator term)*;
-
-add_operator 
-    : PLUS 
-    | MINUS
-    ;
-
-term 
-    : power_expression (multiply_operator power_expression)*
-    ;
-
-multiply_operator 
-    : MULT 
-    | DIV 
-    | MOD
-    ;
-
-power_expression 
-    : unary_expression (POWER unary_expression)*
-    ;
-
-unary_expression 
-    : (unary_operator)? primary_expression
-    ;
-
-unary_operator  
-    : MINUS 
+unary_operator
+    : MINUS
     | NOT
     ;
     
@@ -1263,8 +1121,11 @@ primary_expression
     : constant
     | enumerated_value
     | variable
-    | LPAREN expression RPAREN
-    | function_name LPAREN param_assignment (COMMA param_assignment)* RPAREN
+    | functioncall
+    ;
+
+functioncall
+    :   IDENTIFIER LPAREN param_assignment (COMMA param_assignment)* RPAREN
     ;
 
 statement_list 
@@ -1289,12 +1150,12 @@ subprogram_control_statement
     ;
 
 fb_invocation 
-    : fb_name LPAREN (param_assignment (COMMA param_assignment)*)+ RPAREN
+    : IDENTIFIER LPAREN (param_assignment (COMMA param_assignment)*)+ RPAREN
     ;
 
 param_assignment 
-    : ((variable_name ASSIGN)+ expression)
-    | ((NOT)+ variable_name ARROW_RIGHT variable)
+    : (IDENTIFIER ASSIGN)+ expression
+    | IDENTIFIER ARROW_RIGHT variable
     ;
 
 selection_statement 
@@ -1325,7 +1186,7 @@ case_list
 
 case_list_element 
     : subrange 
-    | signed_integer 
+    | integer
     | enumerated_value
     ;
 
@@ -1337,13 +1198,9 @@ iteration_statement
     ;
 
 for_statement   
-    : FOR control_variable ASSIGN for_list DO
+    : FOR IDENTIFIER ASSIGN for_list DO
         statement_list
       END_FOR
-    ;
-
-control_variable 
-    : IDENTIFIER
     ;
 
 for_list 
