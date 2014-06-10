@@ -76,9 +76,6 @@ DATETIME                : (DATE_AND_TIME|'DT')'#' DATE_VALUE MINUS TOD_VALUE;
 
 INCOMPL_LOCATION_LITERAL: 'AT%'[IQM]'*';
 
-CHARACTER_LITERAL_2BYTE : '$' HEX_DIGIT HEX_DIGIT;
-CHARACTER_LITERAL_4BYTE : '$' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
-
 fragment
 StringCharacters        : ~["];
 
@@ -122,7 +119,6 @@ ULINT                   : 'ULINT';
 USINT                   : 'USINT';
 WORD                    : 'WORD';
 WSTRING                 : 'WSTRING';
-
 
 
 /******
@@ -244,6 +240,7 @@ COMMENT                 : '(*' ~[] '*)';
 
 
 IDENTIFIER              : [a-zA-Z] [a-zA-Z0-9_]*;
+CAST                    : IDENTIFIER '#';
 
 /************************************************/
 
@@ -251,11 +248,7 @@ start : library_element_declaration+;
 
 library_element_name    
     : data_type_name
-    | function_name
-    | function_block_type_name
-    | program_type_name
-    | resource_type_name
-    | configuration_name
+    | IDENTIFIER
     ;
 
 library_element_declaration 
@@ -290,7 +283,7 @@ data_type_name
 
 non_generic_type_name 
     : elementary_type_name
-    | derived_type_name
+    | IDENTIFIER
     ;
 
 elementary_type_name
@@ -331,11 +324,6 @@ real_type_name
     | LREAL
     ;
 
-real_type_cast
-    : REALH
-    | LREALH
-    ;
-
 date_type_name  
     : DATE
     | TIME_OF_DAY
@@ -364,38 +352,6 @@ generic_type_name
     | ANY_DATE
     ;
 
-derived_type_name   
-    : single_element_type_name
-    | array_type_name
-    | structure_type_name
-    | string_type_name
-    ;
-
-single_element_type_name    
-    : simple_type_name
-    | subrange_type_name
-    | enumerated_type_name
-    ;
-
-simple_type_name        
-    : IDENTIFIER
-    ;
-subrange_type_name      
-    : IDENTIFIER
-    ;
-
-enumerated_type_name    
-    : IDENTIFIER
-    ;
-
-array_type_name         
-    : IDENTIFIER
-    ;
-
-structure_type_name     
-    : IDENTIFIER
-    ;
-
 data_type_declaration   
     : TYPE type_declaration SEMICOLON
         (type_declaration SEMICOLON)* 
@@ -416,7 +372,7 @@ single_element_type_declaration
     ;
 
 simple_type_declaration 
-    : simple_type_name COLON simple_spec_init
+    : IDENTIFIER COLON simple_spec_init
     ;
 
 simple_spec_init 
@@ -425,28 +381,28 @@ simple_spec_init
 
 simple_specification 
     : elementary_type_name 
-    | simple_type_name
+    |IDENTIFIER
     ;
 
 subrange_type_declaration 
-    : subrange_type_name COLON subrange_spec_init
+    :IDENTIFIER COLON subrange_spec_init
     ;
 
 subrange_spec_init 
-    : subrange_specification (ASSIGN INTEGER_LITERAL)?
+    : subrange_specification(ASSIGN integer)?
     ;
 
 subrange_specification 
     : integer_type_name LPAREN subrange RPAREN 
-    | subrange_type_name
+    |IDENTIFIER
     ;
 
 subrange 
-    : INTEGER_LITERAL RANGE INTEGER_LITERAL
+    : integer RANGE  integer
     ;
 
 enumerated_type_declaration 
-    : enumerated_type_name COLON enumerated_spec_init
+    :IDENTIFIER COLON enumerated_spec_init
     ;
 
 enumerated_spec_init 
@@ -455,15 +411,15 @@ enumerated_spec_init
 
 enumerated_specification 
     : (LPAREN enumerated_value (COMMA enumerated_value)* RPAREN)
-    | enumerated_type_name
+    | IDENTIFIER
     ;
 
 enumerated_value 
-    : (enumerated_type_name HASH)? IDENTIFIER
+    : CAST IDENTIFIER
     ;
 
 array_type_declaration 
-    : array_type_name COLON array_spec_init
+    :IDENTIFIER COLON array_spec_init
     ;
 
 array_spec_init 
@@ -471,7 +427,7 @@ array_spec_init
     ;
 
 array_specification 
-    : array_type_name
+    :IDENTIFIER
     | ARRAY LBRACKET subrange (COMMA subrange)* RBRACKET
         OF non_generic_type_name
     ;
@@ -486,8 +442,6 @@ array_initial_elements
     | integer LPAREN(array_initial_element)? RPAREN
     ;
 
-
-
 array_initial_element 
     : constant
     | enumerated_value
@@ -496,7 +450,7 @@ array_initial_element
     ;
 
 structure_type_declaration 
-    : structure_type_name COLON structure_specification
+    :IDENTIFIER COLON structure_specification
     ;
 
 structure_specification
@@ -505,7 +459,7 @@ structure_specification
     ;
 
 initialized_structure 
-    : structure_type_name (ASSIGN structure_initialization)?
+    :IDENTIFIER (ASSIGN structure_initialization)?
     ;
 
 structure_declaration 
@@ -515,7 +469,7 @@ structure_declaration
     ;
 
 structure_element_declaration 
-    : structure_element_name COLON
+    :IDENTIFIER COLON
         ( simple_spec_init
         | subrange_spec_init
         | enumerated_spec_init
@@ -523,9 +477,6 @@ structure_element_declaration
         | initialized_structure)
     ;    
 
-structure_element_name 
-    : IDENTIFIER
-    ;
 
 structure_initialization 
     : LPAREN structure_element_initialization
@@ -533,22 +484,19 @@ structure_initialization
     ;
 
 structure_element_initialization 
-    : structure_element_name ASSIGN
+    :IDENTIFIER ASSIGN
         ( constant
         | enumerated_value
         | array_initialization
         | structure_initialization )
     ;
 
-string_type_name 
-    : IDENTIFIER
-    ;
 
 string_type_declaration 
-    : string_type_name COLON 
+    :IDENTIFIER COLON
       (STRING|WSTRING) 
-      (LBRACKET integer RBRACKET)?
-      (ASSIGN string)?
+      ( LBRACKET integer RBRACKET)?
+      (ASSIGN (WSTRING_LITERAL|STRING_LITERAL))?
     ;
 
 variable 
@@ -557,12 +505,11 @@ variable
     ;
 
 symbolic_variable 
-    : variable_name subscript_list?
-      ( DOT symbolic_variable)?
+    : IDENTIFIER subscript_list? ( DOT symbolic_variable)?
     ;
 
-variable_name 
-    : IDENTIFIER
+subscript_list
+    : LBRACKET expression (COMMA expression)* RBRACKET
     ;
 
 
@@ -572,17 +519,6 @@ direct_variable
 
 DIRECT_VARIABLE_LITERAL: '%' [IQM] [XBWDL]? FIXED_POINT;
 
-subscript_list 
-    : LBRACKET subscript (COMMA subscript)* RBRACKET
-    ;
-
-subscript 
-    : expression
-    ;
-
-field_selector 
-    : IDENTIFIER
-    ;
 
 input_declarations 
     : VAR_INPUT (RETAIN | NON_RETAIN)? 
@@ -596,7 +532,7 @@ input_declaration
     ;
 
 edge_declaration 
-    : var1_list COLON BOOL (R_EDGE | F_EDGE)
+    : identifier_list COLON BOOL (R_EDGE | F_EDGE)
     ;
 
 var_init_decl 
@@ -608,35 +544,25 @@ var_init_decl
     ;
 
 var1_init_decl 
-    : var1_list COLON ( simple_spec_init 
+    : identifier_list COLON ( simple_spec_init 
                       | subrange_spec_init 
                       | enumerated_spec_init)
     ;
 
-var1_list 
-    : variable_name (COMMA variable_name)*
-    ;
 
 array_var_init_decl 
-    : var1_list COLON array_spec_init
+    : identifier_list COLON array_spec_init
     ;
 
 structured_var_init_decl 
-    : var1_list COLON initialized_structure
+    : identifier_list COLON initialized_structure
     ;
 
 fb_name_decl 
-    : fb_name_list COLON function_block_type_name 
+    : identifier_list COLON IDENTIFIER
       ( ASSIGN structure_initialization )?
     ;
 
-fb_name_list 
-    : fb_name (COMMA fb_name)*
-    ;
-
-fb_name
-    : IDENTIFIER
-    ;
 
 output_declarations 
     : VAR_OUTPUT (RETAIN | NON_RETAIN)? var_init_decl SEMICOLON
@@ -663,17 +589,17 @@ temp_var_decl
     ;
 
 var1_declaration 
-    : var1_list COLON ( simple_specification 
+    : identifier_list COLON ( simple_specification 
                       | subrange_specification 
                       | enumerated_specification)
     ;
 
 array_var_declaration 
-    : var1_list COLON array_specification
+    : identifier_list COLON array_specification
     ;
 
 structured_var_declaration 
-    : var1_list COLON structure_type_name
+    : identifier_list COLON IDENTIFIER
     ;
 
 var_declarations 
@@ -692,7 +618,7 @@ located_var_declarations
       END_VAR
     ;
 
-located_var_decl : (variable_name)? location COLON located_var_spec_init;
+located_var_decl : (IDENTIFIER)? location COLON located_var_spec_init;
 
 external_var_declarations 
     : VAR_EXTERNAL CONSTANT? external_declaration SEMICOLON 
@@ -701,19 +627,16 @@ external_var_declarations
     ;
 
 external_declaration 
-    : global_var_name COLON 
+    :IDENTIFIER COLON
       ( simple_specification 
       | subrange_specification
       | enumerated_specification 
       | array_specification 
-      | structure_type_name 
-      | function_block_type_name
+      | IDENTIFIER
       )
     ;
 
-global_var_name 
-    : IDENTIFIER
-    ;
+
 
 global_var_declarations 
     : VAR_GLOBAL (CONSTANT | RETAIN)? global_var_decl SEMICOLON 
@@ -722,13 +645,12 @@ global_var_declarations
 
 global_var_decl 
     : global_var_spec COLON 
-      ( located_var_spec_init 
-      | function_block_type_name )?
+      ( located_var_spec_init )?
     ;
 
 global_var_spec 
-    : global_var_list 
-    | (global_var_name)? location
+    : identifier_list 
+    | (IDENTIFIER)? location
     ;
 
 located_var_spec_init   
@@ -744,15 +666,16 @@ location
     : AT direct_variable
     ;
 
-global_var_list 
-    : global_var_name (COMMA global_var_name)*
+identifier_list
+    : IDENTIFIER (COMMA IDENTIFIER)*
     ;
 
 string_var_declaration 
-    : var1_list COLON (WSTRING|STRING)
+    : identifier_list COLON (WSTRING|STRING)
       (LBRACKET integer RBRACKET)?
       (ASSIGN (WSTRING_LITERAL | STRING_LITERAL))?
     ;
+
 
 
 incompl_located_var_declarations 
@@ -763,7 +686,7 @@ incompl_located_var_declarations
     ;
 
 incompl_located_var_decl 
-    : variable_name INCOMPL_LOCATION_LITERAL COLON var_spec
+    :IDENTIFIER INCOMPL_LOCATION_LITERAL COLON var_spec
     ;
 
 var_spec 
@@ -771,27 +694,15 @@ var_spec
     | subrange_specification 
     | enumerated_specification 
     | array_specification 
-    | structure_type_name 
-    | (STRING | WSTRING) ( LBRACKET integer RBRACKET)? 
-    ;
-
-function_name 
-    : standard_function_name 
-    | derived_function_name
-    ;
-
-standard_function_name 
-    : IDENTIFIER /*<as defined in clause 2.5.1.5 of the standard>*/
-    ;
-
-derived_function_name 
-    : IDENTIFIER
+    | IDENTIFIER
+    | (STRING | WSTRING) (LBRACKET integer RBRACKET)?
     ;
 
 function_declaration 
-    : FUNCTION derived_function_name COLON
-        (elementary_type_name | derived_type_name)
-        ( io_var_declarations | function_var_decls )* function_body
+    : FUNCTION IDENTIFIER COLON
+        (elementary_type_name | IDENTIFIER)
+        (io_var_declarations | function_var_decls )*
+        function_body
       END_FUNCTION
     ;
      
@@ -823,23 +734,11 @@ var2_init_decl
     | string_var_declaration
     ;
 
-function_block_type_name 
-    : standard_function_block_name
-    | derived_function_block_name
-    ;
-
-standard_function_block_name 
-    : IDENTIFIER /* <as defined in clause 2.5.2.3 of the standard>*/
-    ;
-
-derived_function_block_name 
-    : IDENTIFIER
-    ;
 
 function_block_declaration 
-    : FUNCTION_BLOCK derived_function_block_name
+    : FUNCTION_BLOCK name=IDENTIFIER
       ( io_var_declarations | other_var_declarations )*
-                                function_block_body
+      body=function_block_body
       END_FUNCTION_BLOCK
     ;
 
@@ -875,12 +774,9 @@ function_block_body
 | statement_list
 /*| <other languages>
 ;*/
-program_type_name 
-    : IDENTIFIER
-    ;
 
 program_declaration     
-    : PROGRAM program_type_name
+    : PROGRAM name=IDENTIFIER
       ( io_var_declarations
       | other_var_declarations
       | located_var_declarations
@@ -898,20 +794,13 @@ program_access_decls
     ;
 
 program_access_decl 
-    : access_name COLON symbolic_variable COLON 
+    :IDENTIFIER COLON symbolic_variable COLON
         non_generic_type_name (direction)?
     ;
 
-configuration_name 
-    : IDENTIFIER
-    ;
-
-resource_type_name 
-    : IDENTIFIER
-    ;
 
 configuration_declaration 
-    : CONFIGURATION configuration_name
+    : CONFIGURATION name=IDENTIFIER
         (global_var_declarations)?
         ( single_resource_declaration
         | (resource_declaration (resource_declaration)*)
@@ -922,7 +811,7 @@ configuration_declaration
     ;
 
 resource_declaration 
-    : RESOURCE resource_name ON resource_type_name
+    : RESOURCE IDENTIFIER ON IDENTIFIER
       (global_var_declarations)?
       single_resource_declaration
       END_RESOURCE
@@ -934,9 +823,6 @@ single_resource_declaration
       (program_configuration SEMICOLON)*
     ;
 
-resource_name 
-    : IDENTIFIER
-    ;
 
 access_declarations 
     : VAR_ACCESS
@@ -946,29 +832,22 @@ access_declarations
     ;
 
 access_declaration 
-    : access_name COLON access_path COLON
+    :IDENTIFIER COLON access_path COLON
       non_generic_type_name (direction)?;
 
 access_path 
-    : (resource_name DOT )? direct_variable
-    | (resource_name DOT)? (program_name DOT)?
-      (fb_name DOT)* symbolic_variable;
+    : (IDENTIFIER DOT)? direct_variable
+    | (IDENTIFIER DOT)* symbolic_variable
+    ;
 
 global_var_reference 
-    : (resource_name DOT)? 
-      global_var_name (DOT structure_element_name)?
-    ;
-access_name 
-    : IDENTIFIER
+    : (IDENTIFIER DOT)? IDENTIFIER (DOT IDENTIFIER)?
     ;
 
 program_output_reference 
-    : program_name DOT symbolic_variable
+    : IDENTIFIER DOT symbolic_variable
     ;
 
-program_name 
-    : IDENTIFIER
-    ;
 
 direction 
     : READ_WRITE 
@@ -976,12 +855,9 @@ direction
     ;
 
 task_configuration 
-    : TASK task_name task_initialization
+    : TASK IDENTIFIER task_initialization
     ;
 
-task_name 
-    : IDENTIFIER
-    ;
 
 task_initialization 
     : LPAREN (SINGLE ASSIGN data_source COMMA)?
@@ -999,7 +875,7 @@ data_source
 
 program_configuration   
     : PROGRAM (RETAIN | NON_RETAIN)?
-        program_name (WITH task_name)? COLON program_type_name
+        IDENTIFIER (WITH IDENTIFIER)? COLON IDENTIFIER
         ( LPAREN prog_conf_elements RPAREN)?
     ;
 
@@ -1013,7 +889,7 @@ prog_conf_element
     ;
 
 fb_task 
-    : fb_name WITH task_name
+    : IDENTIFIER WITH IDENTIFIER
     ;
 
 prog_cnxn 
@@ -1041,45 +917,27 @@ instance_specific_initializations
     ;
 
 instance_specific_init 
-    : resource_name DOT program_name DOT (fb_name DOT)*
-      ((variable_name (location)? COLON located_var_spec_init) |
-                (fb_name COLON function_block_type_name ASSIGN
+    : IDENTIFIER DOT IDENTIFIER DOT (IDENTIFIER DOT)*
+      ((IDENTIFIER (location)? COLON located_var_spec_init) |
+                (IDENTIFIER COLON IDENTIFIER ASSIGN
                    structure_initialization))
     ;
 
 
-expr
-    : unary_expression? primary_expression // IA
-    | expr XOR expr
-    | expr OR expr
-    | expr AND expr
-    | expr (EQUALS | NOT_EQUALS) expr
-    | expr comparison_operator expr
-    | expr (PLUS|MINUS) expr
-    | expr (MULT) expr
+expression
+    : unary_operator expression
+    | LPAREN expression RPAREN
+    | expression POWER expression
     |<assoc=right>
-      expr (MOD|DIV) expr
-    | expr POWER expr
-    ;
-
-expression 
-    : xor_expression (OR xor_expression)*
-    ;
-
-xor_expression 
-    : and_expression (XOR and_expression)*
-    ;
-
-and_expression 
-    : comparison ((AMPERSAND | AND) comparison)*
-    ;
-
-comparison 
-    : equ_expression ( (EQUALS | NOT_EQUALS) equ_expression)*
-    ;
-
-equ_expression 
-    : add_expression (comparison_operator add_expression)*
+      expression (MOD|DIV) expression
+    | expression (MULT) expression
+    | expression (PLUS|MINUS) expression
+    | expression comparison_operator expression
+    | expression (EQUALS | NOT_EQUALS) expression
+    | expression AND expression
+    | expression OR expression
+    | expression XOR expression
+    | primary_expression
     ;
 
 comparison_operator 
@@ -1089,34 +947,8 @@ comparison_operator
     | LESS_EQUALS
     ;
 
-add_expression 
-    : term (add_operator term)*;
-
-add_operator 
-    : PLUS 
-    | MINUS
-    ;
-
-term 
-    : power_expression (multiply_operator power_expression)*
-    ;
-
-multiply_operator 
-    : MULT 
-    | DIV 
-    | MOD
-    ;
-
-power_expression 
-    : unary_expression (POWER unary_expression)*
-    ;
-
-unary_expression 
-    : (unary_operator)? primary_expression
-    ;
-
-unary_operator  
-    : MINUS 
+unary_operator
+    : MINUS
     | NOT
     ;
     
@@ -1124,8 +956,11 @@ primary_expression
     : constant
     | enumerated_value
     | variable
-    | LPAREN expression RPAREN
-    | function_name LPAREN param_assignment (COMMA param_assignment)* RPAREN
+    | functioncall
+    ;
+
+functioncall
+    :   IDENTIFIER LPAREN param_assignment (COMMA param_assignment)* RPAREN
     ;
 
 statement_list 
@@ -1150,12 +985,12 @@ subprogram_control_statement
     ;
 
 fb_invocation 
-    : fb_name LPAREN (param_assignment (COMMA param_assignment)*)+ RPAREN
+    : IDENTIFIER LPAREN (param_assignment (COMMA param_assignment)*)+ RPAREN
     ;
 
 param_assignment 
-    : (variable_name ASSIGN)+ expression
-    | variable_name ARROW_RIGHT variable
+    : (IDENTIFIER ASSIGN)+ expression
+    | IDENTIFIER ARROW_RIGHT variable
     ;
 
 selection_statement 
@@ -1198,7 +1033,7 @@ iteration_statement
     ;
 
 for_statement   
-    : FOR control_variable ASSIGN for_list DO
+    : FOR IDENTIFIER ASSIGN for_list DO
         statement_list
       END_FOR
     ;
