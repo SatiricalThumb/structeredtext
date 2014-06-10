@@ -1,7 +1,7 @@
 grammar StructuredText;
 
 fragment
-FIXED_POINT                             : DIGIT+ (DOT DIGIT+)?;
+FIXED_POINT                             : NUMBER (DOT NUMBER)?;
 
 fragment
 LETTER                                  : 'a'..'z' | 'A'..'Z';
@@ -26,7 +26,7 @@ Underscores
  */
 
 fragment
-BIT_TYPES               : (BOOL|WORD|DWORD|LWORD) '#';
+BIT_TYPES               : (BOOL|BYTE|WORD|DWORD|LWORD) '#';
 
 fragment
 INT_TYPES               : (SINT|INT|DINT|LINT) '#' (MINUS|PLUS)?;
@@ -55,9 +55,9 @@ HEX_LITERAL             : '16#' HEX_DIGIT (Underscores | Underscores HEX_DIGIT)*
 
 INTEGER_LITERAL         : (UINT_TYPES|INT_TYPES|BIT_TYPES)? (OCTAL_DIGIT|BINARY_LITERAL|HEX_LITERAL|NUMBER);
 
-REAL_LITERAL            : REAL_TYPES? [+-]? FIXED_POINT ([eE] FIXED_POINT+)?;
+REAL_LITERAL            : (REAL_TYPES [+-]?)? FIXED_POINT ([eE] FIXED_POINT+)?;
 
-TIME_LITERAL            : (TIME|'T') '#' (FIXED_POINT ('h'|'m'|'s'|'ms'))+;
+TIME_LITERAL            : (TIME|'T') '#' (FIXED_POINT ('d'|'h'|'m'|'s'|'ms'))+;
 
 fragment
 DATE_VALUE              :  NUMBER MINUS NUMBER MINUS NUMBER;
@@ -240,7 +240,7 @@ COMMENT                 : '(*' ~[] '*)';
 
 
 IDENTIFIER              : [a-zA-Z] [a-zA-Z0-9_]*;
-CAST                    : IDENTIFIER '#';
+CAST_LITERAL                    : IDENTIFIER '#';
 
 /************************************************/
 
@@ -268,14 +268,18 @@ constant
     | date
     | FALSE
     | TRUE
+    | datetime
+    | cast
     ;
 
+cast : CAST_LITERAL;
 integer  : INTEGER_LITERAL;
 real     : REAL_LITERAL;
-string   : WSTRING|STRING;
+string   : WSTRING_LITERAL | STRING_LITERAL;
 time     : TIME_LITERAL;
 timeofday: TOD_LITERAL;
 date     : DATE_LITERAL;
+datetime : DATETIME;
 
 data_type_name 
     : non_generic_type_name | generic_type_name
@@ -353,69 +357,57 @@ generic_type_name
     ;
 
 data_type_declaration   
-    : TYPE type_declaration SEMICOLON
-        (type_declaration SEMICOLON)* 
-      END_TYPE
+    : TYPE (type_declaration SEMICOLON)+ END_TYPE
     ;
 
 type_declaration    
-    : single_element_type_declaration
-    | array_type_declaration
+    : array_type_declaration
     | structure_type_declaration
     | string_type_declaration
-    ;
-
-single_element_type_declaration
-    : simple_type_declaration
+    | simple_type_declaration
     | subrange_type_declaration
     | enumerated_type_declaration
     ;
 
-simple_type_declaration 
+simple_type_declaration
     : IDENTIFIER COLON simple_spec_init
     ;
 
-simple_spec_init 
+simple_spec_init
     : simple_specification (ASSIGN constant)?
     ;
 
-simple_specification 
-    : elementary_type_name 
-    |IDENTIFIER
+simple_specification
+    : elementary_type_name
+    | IDENTIFIER
     ;
 
-subrange_type_declaration 
+subrange_type_declaration
     :IDENTIFIER COLON subrange_spec_init
     ;
 
 subrange_spec_init 
-    : subrange_specification(ASSIGN integer)?
+    : subrange_specification (ASSIGN integer)?
     ;
 
 subrange_specification 
     : integer_type_name LPAREN subrange RPAREN 
-    |IDENTIFIER
-    ;
-
-subrange 
-    : integer RANGE  integer
-    ;
-
-enumerated_type_declaration 
-    :IDENTIFIER COLON enumerated_spec_init
-    ;
-
-enumerated_spec_init 
-    : enumerated_specification (ASSIGN enumerated_value)?
-    ;
-
-enumerated_specification 
-    : (LPAREN enumerated_value (COMMA enumerated_value)* RPAREN)
     | IDENTIFIER
     ;
 
-enumerated_value 
-    : CAST IDENTIFIER
+subrange 
+    : MINUS? integer RANGE  MINUS? integer
+    ;
+
+enumerated_type_declaration 
+    :IDENTIFIER COLON enumerated_specification (ASSIGN IDENTIFIER|CAST_LITERAL )?
+    ;
+
+
+/* removed: casting of identifiers */
+enumerated_specification 
+    : (LPAREN IDENTIFIER (COMMA IDENTIFIER)* RPAREN)
+    | IDENTIFIER
     ;
 
 array_type_declaration 
@@ -444,7 +436,6 @@ array_initial_elements
 
 array_initial_element 
     : constant
-    | enumerated_value
     | structure_initialization
     | array_initialization
     ;
@@ -472,7 +463,7 @@ structure_element_declaration
     :IDENTIFIER COLON
         ( simple_spec_init
         | subrange_spec_init
-        | enumerated_spec_init
+        | cast
         | array_spec_init
         | initialized_structure)
     ;    
@@ -486,7 +477,6 @@ structure_initialization
 structure_element_initialization 
     :IDENTIFIER ASSIGN
         ( constant
-        | enumerated_value
         | array_initialization
         | structure_initialization )
     ;
@@ -544,9 +534,7 @@ var_init_decl
     ;
 
 var1_init_decl 
-    : identifier_list COLON ( simple_spec_init 
-                      | subrange_spec_init 
-                      | enumerated_spec_init)
+    : identifier_list COLON ( simple_spec_init | subrange_spec_init | cast )
     ;
 
 
@@ -656,7 +644,7 @@ global_var_spec
 located_var_spec_init   
     : simple_spec_init
     | subrange_spec_init
-    | enumerated_spec_init
+    | cast
     | array_spec_init
     | initialized_structure
     | string_var_declaration
@@ -899,7 +887,6 @@ prog_cnxn
 
 prog_data_source 
     : constant
-    | enumerated_value
     | global_var_reference
     | direct_variable
     ;
@@ -954,7 +941,6 @@ unary_operator
     
 primary_expression  
     : constant
-    | enumerated_value
     | variable
     | functioncall
     ;
@@ -1022,7 +1008,8 @@ case_list
 case_list_element 
     : subrange 
     | integer
-    | enumerated_value
+    | cast
+    | IDENTIFIER
     ;
 
 iteration_statement 

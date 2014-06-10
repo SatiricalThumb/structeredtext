@@ -1,0 +1,5 @@
+<gunit package="edu.kit.iti.structuredtext.antlr"
+       lexer="edu.kit.iti.structuredtext.antlr.StructuredTextLexer"
+       parser="edu.kit.iti.structuredtext.antlr.StructuredTextParser">
+
+</gunit>

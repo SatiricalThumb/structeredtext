@@ -1,4 +1,4 @@
-package edu.kit.iti.structuredtext.visitors;
+package edu.kit.iti.structuredtext;
 
 import edu.kit.iti.structuredtext.MyTestRig;
 import edu.kit.iti.structuredtext.antlr.StructuredTextLexer;
@@ -6,9 +6,9 @@ import edu.kit.iti.structuredtext.antlr.StructuredTextListener;
 import edu.kit.iti.structuredtext.antlr.StructuredTextParser;
 import edu.kit.iti.structuredtext.ast.Expression;
 import edu.kit.iti.structuredtext.ast.Statement;
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
+import edu.kit.iti.structuredtext.visitors.ExpressionParseTreeVisitor;
+import edu.kit.iti.structuredtext.visitors.StatementToAstVisitor;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by weigla on 09.06.2014.
@@ -38,24 +39,29 @@ public class Utils {
         }
     }
 
-    public static Statement toStatement(StructuredTextParser.StatementContext ctx) {
-        StatementToAstVisitor visitor = new StatementToAstVisitor();
-        return visitor.visit(ctx);
-    }
+    public static  void compareTokens(List<? extends Token> tokens, String[] expected, Lexer lexer) {
+        try {
+            for (int i = 0; i < expected.length; i++) {
+                int expect = lexer.getTokenType(expected[i]);
+                Token tok = tokens.get(i);
+                String tokName = StructuredTextLexer.tokenNames[tok.getType()];
 
-    public static Expression toExpression(StructuredTextParser.ExpressionContext ctx) {
-        ExpressionParseTreeVisitor visitor = new ExpressionParseTreeVisitor();
-        return ctx.accept(visitor);
-    }
 
-    public static void test() {
-        String tmp = "IF b THEN a:= 1; END_IF";
+                if (!expected[i].contentEquals(tokName)) {
+                    throw new AssertionError(
+                            String.format("Token mismatch! Expected: %s but got %s",
+                                    expected[i], tokName)
+                    );
+                }
+            }
+        } catch (IndexOutOfBoundsException e) {
+            throw new AssertionError(
+                    "Not enough tokens found!"
+            );
+        }
 
-        StructuredTextLexer stl = new StructuredTextLexer(new ANTLRInputStream(tmp));
-        CommonTokenStream cts = new CommonTokenStream(stl);
-        StructuredTextParser stp = new StructuredTextParser(cts);
-        stp.setBuildParseTree(true);
-        StructuredTextParser.StatementContext obj = stp.statement();
-        toStatement(obj);
+        if (expected.length < tokens.size()) {
+            throw new AssertionError("Too much tokens found!");
+        }
     }
 }

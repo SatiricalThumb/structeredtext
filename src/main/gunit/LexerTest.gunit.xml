@@ -1,0 +1,13 @@
+<gunit package="edu.kit.iti.structuredtext.antlr"
+       lexer="edu.kit.iti.structuredtext.antlr.StructuredTextLexer"
+       parser="edu.kit.iti.structuredtext.antlr.StructuredTextParser">
+
+    <lexer>
+        <cases sequence="TOD_LITERAL">
+            TIME_OF_DAY#15:36:25.36
+            TIME_OF_DAY#15:36:25
+            TOD#15:36:25.36
+            TOD#15:36:25
+        </cases>
+    </lexer>
+</gunit>

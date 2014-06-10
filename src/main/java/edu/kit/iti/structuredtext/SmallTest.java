@@ -13,15 +13,15 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by weigla on 07.06.2014.
  */
 public class SmallTest {
     public static void main(String[] argv) throws Exception {
-        test_line_lexer("2*3+5*5+2");
-        MyTestRig rig = new MyTestRig("2*3+5*5+2", "expression");
+        String input = "TYPE\n                temperatur : INT (-40..70);\n                monatstage: INT(1..31);\n            END_TYPE";
+        test_line_lexer(input);
+        MyTestRig rig = new MyTestRig(input,  "data_type_declaration");
     }
 
     private static void test_line_lexer(String tmp) {

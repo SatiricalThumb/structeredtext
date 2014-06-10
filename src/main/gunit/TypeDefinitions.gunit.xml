@@ -1,0 +1,46 @@
+<gunit package="edu.kit.iti.structuredtext.antlr"
+       lexer="edu.kit.iti.structuredtext.antlr.StructuredTextLexer"
+       parser="edu.kit.iti.structuredtext.antlr.StructuredTextParser">
+
+    <parser>
+        <case rule="data_type_declaration">
+            TYPE wochtentag_type : (mon, die, mit , don, fre,sam, son); END_TYPE
+        </case>
+
+        <case rule="data_type_declaration">
+            TYPE
+                temperatur : INT (-40..70);
+                monatstage: INT(1..31);
+            END_TYPE
+        </case>
+
+        <case rule="data_type_declaration">
+            TYPE feld: ARRAY[1..16] of INT;
+            END_TYPE
+        </case>
+
+        <case rule="data_type_declaration">
+            TYPE f: feld;
+                 i: INTEGER;
+            END_TYPE
+        </case>
+
+        <case rule="data_type_declaration">
+            TYPE waehrungs_typ : (Euro,Dollar,Yen,Pfund,Default) := Default;
+                 fertigungstage: wochentag_typ (mon..fre);
+            END_TYPE
+        </case>
+
+        <case rule="data_type_declaration">
+            TYPE temp_sig :
+                STRUCT
+                    temp:temperatur;
+                    filter_param: SINT (0..99);
+                END_STRUCT;
+            END_TYPE;
+        </case>
+
+    </parser>
+
+
+</gunit>
