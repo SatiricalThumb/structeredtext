@@ -29,6 +29,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -54,6 +55,13 @@
             <artifactId>scala-maven-plugin</artifactId>
             <version>3.1.6</version>
         </dependency>
+
+        <dependency>
+            <groupId>weigl</groupId>
+            <artifactId>gunit-maven-plugin</artifactId>
+            <version>0.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -77,6 +85,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
@@ -96,6 +105,13 @@
                     </jvmArgs>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>weigl</groupId>
+                <artifactId>gunit-maven-plugin</artifactId>
+                <version>0.1</version>
+            </plugin>
+
         </plugins>
 
     </build>

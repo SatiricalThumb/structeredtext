@@ -91,7 +91,6 @@ public class GrammarTest {
         Class<?> clazz = stp.getClass();
         Method method = clazz.getMethod(rule);
         method.invoke(stp);
-
         if(stp.getNumberOfSyntaxErrors()!=0){
            MyTestRig mtr = new MyTestRig(tmp, rule);
         }

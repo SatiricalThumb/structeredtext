@@ -1,214 +1,251 @@
 grammar StructuredText;
 
-fragment FIXED_POINT: DIGIT+ (DOT DIGIT+)?;
+fragment
+FIXED_POINT                             : DIGIT+ (DOT DIGIT+)?;
 
-DAY_LITERAL : FIXED_POINT 'd';
-HOURS_LITERAL : FIXED_POINT 'h';
-MINUTES_LITERAL : FIXED_POINT 'm';
-SECONDS_LITERAL : FIXED_POINT 's';
-MILLIESECONDS_LITERAL : FIXED_POINT 'ms';
+fragment
+LETTER                                  : 'a'..'z' | 'A'..'Z';
+
+fragment
+DIGIT                                   : '0'..'9';
+
+fragment
+HEX_DIGIT                               : DIGIT | 'A'..'F';
+
+fragment
+OCTAL_DIGIT                             : '0'..'7';
+
+fragment
+Underscores
+: '_'+
+;
 
 
-fragment LETTER : ('a'..'z' | 'A'..'Z');
-fragment DIGIT : '0'..'9';
-fragment HEX_DIGIT : DIGIT | 'A'..'F';
-fragment OCTAL_DIGIT : '0'..'7';
+/******
+ * Literal
+ */
+
+fragment
+BIT_TYPES               : (BOOL|WORD|DWORD|LWORD) '#';
+
+fragment
+INT_TYPES               : (SINT|INT|DINT|LINT) '#' (MINUS|PLUS)?;
+
+fragment
+UINT_TYPES               : (USINT|UINT|UDINT|ULINT) '#';
+
+fragment
+REAL_TYPES              : (REAL|LREAL) '#';
+
+fragment
+NUMBER                  : DIGIT (DIGIT | Underscores DIGIT)*;
+
+fragment
+NUMBER_BASE             : ('2'|'8'|'16') '#';
+
+fragment
+OCTAL_LITERAL           : '8#' OCTAL_DIGIT (OCTAL_DIGIT | Underscores OCTAL_DIGIT)*;
+
+fragment
+BINARY_LITERAL          : '2#' BIT (BIT | Underscores BIT)*;
+
+fragment
+HEX_LITERAL             : '16#' HEX_DIGIT (Underscores | Underscores HEX_DIGIT)*;
 
 
+INTEGER_LITERAL         : (UINT_TYPES|INT_TYPES|BIT_TYPES)? (OCTAL_DIGIT|BINARY_LITERAL|HEX_LITERAL|NUMBER);
+
+REAL_LITERAL            : REAL_TYPES? [+-]? FIXED_POINT ([eE] FIXED_POINT+)?;
+
+TIME_LITERAL            : (TIME|'T') '#' (FIXED_POINT ('h'|'m'|'s'|'ms'))+;
+
+fragment
+DATE_VALUE              :  NUMBER MINUS NUMBER MINUS NUMBER;
+
+fragment
+TwoDigit                : DIGIT? DIGIT;
+
+fragment
+TOD_VALUE               : TwoDigit COLON TwoDigit COLON TwoDigit (DOT TwoDigit)?;
+
+
+DATE_LITERAL             : (DATE|'D')'#' DATE_VALUE;
+TOD_LITERAL             : (TIME_OF_DAY|'TOD')'#' TOD_VALUE;
+
+DATETIME                : (DATE_AND_TIME|'DT')'#' DATE_VALUE MINUS TOD_VALUE;
+
+INCOMPL_LOCATION_LITERAL: 'AT%'[IQM]'*';
 
 CHARACTER_LITERAL_2BYTE : '$' HEX_DIGIT HEX_DIGIT;
 CHARACTER_LITERAL_4BYTE : '$' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
 
-INTEGER_LITERAL: DIGIT (DIGIT |'_')*;
-OCTAL_LITERAL:   '8#' OCTAL_DIGIT (OCTAL_DIGIT |'_')*;
-BINARY_LITERAL:  '2#' BIT (BIT | '_')*;
-HEX_LITERAL:    '16#' HEX_DIGIT ('_' | HEX_DIGIT)*;
-REAL_LITERAL: [+-]? FIXED_POINT ([eE] DIGIT+)?;
+fragment
+StringCharacters        : ~["];
+
+STRING_LITERAL          : ['] (StringCharacters| '$\'')* ['];
+WSTRING_LITERAL         : ["] (StringCharacters| '$"')* ["];
 
 
-REALH:'REALH';
-LREALH:'REALH';
-RETURN:'RETURN';
-COMMA:',';
-ARROW_RIGHT : '=>';
-NOT:'NOT';
-END_CASE:'END_CASE';
-OF:'OF';
-CASE: 'CASE';
-IF: 'IF';
-ELSEIF:'ELSEIF';
-ELSE:'ELSE';
-THEN:'THEN';
-
-//Cast Operators
-BYTEH:'BYTE#';
-BOOLH:'BOOL#';
-WORDH:'WORD#';
-DWORDH:'DWORD#';
-LWORDH:'LWORD#';
-
-WORD:'WORD';
-DWORD:'DWORD';
-LWORD:'LWORD';
-HASH:'#';
-
-TRUE  : 'TRUE';
-FALSE : 'FALSE';
-SQUOTE:'\'';
-DQUOTE:'"';
-DOLLAR:'$';
-T:'T';
-TIME:'TIME';
-STRING  : 'STRING';
-WSTRING : 'WSTRING';
-INT:'INT';
-SINT:'SINT';
-DINT:'DINT';
-LINT:'LINT';
-UINT:'UINT';
-USINT:'USINT';
-UDINT:'UDINT';
-ULINT:'ULINT';
-REAL:'REAL';
-BOOL:'BOOL';
-ANY:'ANY';
-ANY_DERIVED:'ANY_DERIVED';
-ANY_MAGNITUDE:'ANY_MAGNITUDE';
-ANY_ELEMENTARY:'ANY_ELEMENTARY';
-ANY_NUM:'ANY_NUM';
-ANY_REAL:'ANY_REAL';
-ANY_INT:'ANY_INT';
-ANY_BIT:'ANY_BIT';
-ANY_STRING:'ANY_STRING';
-ANY_DATE:'ANY_DATE';
-ARRAY:'ARRAY';
-
-//EXPONENT: [eE];
-MULT:'*';
-DIV:'/';
-MOD:'MOD';
-LPAREN: '(';
-RPAREN: ')';
-
-LBRACKET:'[';
-RBRACKET:']';
-
-SEMICOLON:';';
-POWER:'**';
-ASSIGN:':=';
-FOR:'FOR';
-END_FOR:'END_FOR';
-TO:'TO';
-BY:'BY';
-DO:'DO';
-WHILE:'WHILE';
-END_WHILE:'END_WHILE';
-UNTIL: 'UNTIL';
-END_REPEAT: 'END_REPEAT';
-REPEAT: 'REPEAT';
-EXIT: 'EXIT';
+/******
+ * DATATYPES
+ */
 
 
-NIL : 'NIL';
-RETAIN : 'RETAIN';
-NON_RETAIN : 'NON_RETAIN';
-
-BIT : '1' | '0';
-
-
-WS: [ \r\t\n] -> skip;
-
-BYTE: 'BYTE';
-MINUS: '-';
-PLUS : '+';
-
-LESS_THAN:'<';
-GREATER_THAN:'>';
-GREATER_EQUALS:'>=';
-LESS_EQUALS: '<=';
-EQUALS: '=';
-NOT_EQUALS:'<>';
-
-AMPERSAND:'&';
-VAR_OUTPUT:'VAR_OUTPUT';
-VAR_EXTERNAL:'VAR_EXTERNAL';
-FUNCTION_BLOCK:'FUNCTION_BLOCK';
-END_PROGRAM:'END_PROGRAM';
-RIGHT_ARROW:'RIGHT_ARROW';
-END_STRUCT:'END_STRUCT';
-END_IF:'END_IF';
-VAR_TEMP:'VAR_TEMP';
-COLON:':';
-
-DT:'DT';
-LREAL:'LREAL';
-PERCENT:'%';
-PROGRAM: 'PROGRAM';
-OR:'OR';
-AND:'AND';
-XOR:'XOR';
-END_CONFIGURATION:'END_CONFIGURATION';
-
-DATE:'DATE';
-DATEH:'DATE#' | 'D#';
-STRUCT: 'STRUCT';
-DOT: '.';
-WITH:'WITH';
-SINGLE: 'SINGLE';
-END_TYPE:'END_TYPE';
-VAR_INPUT: 'VAR_INPUT';
-VAR_GLOBAL:'VAR_GLOBAL';
-TASK:'TASK';
-TYPE:'TYPE';
-FUNCTION:'FUNCTION';
-DOLLAR_DQUOTE: '$"';
-VAR_IN_OUT:'VAR_IN_OUT';
-END_FUNCTION:'END_FUNCTION';
-END_FUNCTION_BLOCK:'END_FUNCTION_BLOCK';
-INTERVAL:'INTERVAL';
-CONSTANT:'CONSTANT';
-VAR:'VAR';
-VAR_CONFIG:'VAR_CONFIG';
-END_VAR:'END_VAR';
-PRIORITY:'PRIORITY';
-READ_WRITE:'READ_WRITE';
-READ_ONLY:'READ_ONLY';
-VAR_ACCESS:'VAR_ACCESS';
-RANGE: '..';
-END_RESOURCE:'END_RESOURCE';
-CONFIGURATION:'CONFIGURATION';
-RESOURCE:'RESOURCE';
-ON:'ON';
-R_EDGE:'R_EDGE';
-F_EDGE:'F_EDGE';
-AT:'AT';
-I:'I';
-Q:'Q';
-M:'M';
-X:'X';
-B:'B';
-W:'W';
-D:'D';
-L:'L';
-DOLLAR_SQUOTE:'$\'';
-DOLLAR_DOLLAR: '$$';
-DOLLAR_L: '$L';
-DOLLAR_N: '$N';
-DOLLAR_P: '$P';
-DOLLAR_R: '$R';
-DOLLAR_T: '$T';
-DOLLAR_l: '$l';
-DOLLAR_n: '$n';
-DOLLAR_p: '$p';
-DOLLAR_r: '$r';
-DOLLAR_t: '$t';
-UNDERSCORE:'_';
-TIME_OF_DAY:'TIME_OF_DAY#';
-TOD:'TOD#';
-DATE_AND_TIME:'DATE_AND_TIME';
+ANY                     : 'ANY';
+ANY_BIT                 : 'ANY_BIT';
+ANY_DATE                : 'ANY_DATE';
+ANY_DERIVED             : 'ANY_DERIVED';
+ANY_ELEMENTARY          : 'ANY_ELEMENTARY';
+ANY_INT                 : 'ANY_INT';
+ANY_MAGNITUDE           : 'ANY_MAGNITUDE';
+ANY_NUM                 : 'ANY_NUM';
+ANY_REAL                : 'ANY_REAL';
+ANY_STRING              : 'ANY_STRING';
+ARRAY                   : 'ARRAY';
+BOOL                    : 'BOOL';
+BYTE                    : 'BYTE';
+DATE_AND_TIME           : 'DATE_AND_TIME';
+DINT                    : 'DINT';
+DWORD                   : 'DWORD';
+INT                     : 'INT';
+LINT                    : 'LINT';
+LREAL                   : 'LREAL';
+LWORD                   : 'LWORD';
+REAL                    : 'REAL';
+SINT                    : 'SINT';
+STRING                  : 'STRING';
+TIME                    : 'TIME';
+TIME_OF_DAY             : 'TIME_OF_DAY'|'TOD';
+UDINT                   : 'UDINT';
+UINT                    : 'UINT';
+ULINT                   : 'ULINT';
+USINT                   : 'USINT';
+WORD                    : 'WORD';
+WSTRING                 : 'WSTRING';
 
 
-IDENTIFIER: [a-zA-Z] [a-zA-Z0-9_]*;
+
+/******
+ * Keywords
+ */
+
+VAR_OUTPUT               : 'VAR_OUTPUT';
+AT                      : 'AT';
+BY                      : 'BY';
+CASE                    : 'CASE';
+COLON                   : ':';
+CONFIGURATION           : 'CONFIGURATION';
+CONSTANT                : 'CONSTANT';
+DATE                    : 'DATE';
+DO                      : 'DO';
+DT                      : 'DT';
+ELSE                    : 'ELSE';
+ELSEIF                  : 'ELSEIF';
+END_CASE                : 'END_CASE';
+END_CONFIGURATION       : 'END_CONFIGURATION';
+END_FOR                 : 'END_FOR';
+END_FUNCTION            : 'END_FUNCTION';
+END_FUNCTION_BLOCK      : 'END_FUNCTION_BLOCK';
+END_IF                  : 'END_IF';
+END_PROGRAM             : 'END_PROGRAM';
+END_REPEAT              : 'END_REPEAT';
+END_RESOURCE            : 'END_RESOURCE';
+END_STRUCT              : 'END_STRUCT';
+END_TYPE                : 'END_TYPE';
+END_VAR                 : 'END_VAR';
+END_WHILE               : 'END_WHILE';
+EXIT                    : 'EXIT';
+FOR                     : 'FOR';
+FUNCTION                : 'FUNCTION';
+FUNCTION_BLOCK          : 'FUNCTION_BLOCK';
+F_EDGE                  : 'F_EDGE';
+IF                      : 'IF';
+INTERVAL                : 'INTERVAL';
+NIL                     : 'NIL';
+NON_RETAIN              : 'NON_RETAIN';
+OF                      : 'OF';
+ON                      : 'ON';
+PRIORITY                : 'PRIORITY';
+PROGRAM                 : 'PROGRAM';
+READ_ONLY               : 'READ_ONLY';
+READ_WRITE              : 'READ_WRITE';
+REPEAT                  : 'REPEAT';
+RESOURCE                : 'RESOURCE';
+RETAIN                  : 'RETAIN';
+RETURN                  : 'RETURN';
+RIGHT_ARROW             : 'RIGHT_ARROW';
+R_EDGE                  : 'R_EDGE';
+SINGLE                  : 'SINGLE';
+STRUCT                  : 'STRUCT';
+TASK                    : 'TASK';
+THEN                    : 'THEN';
+TO                      : 'TO';
+TYPE                    : 'TYPE';
+UNTIL                   : 'UNTIL';
+VAR                     : 'VAR';
+VAR_ACCESS              : 'VAR_ACCESS';
+VAR_CONFIG              : 'VAR_CONFIG';
+VAR_EXTERNAL            : 'VAR_EXTERNAL';
+VAR_GLOBAL              : 'VAR_GLOBAL';
+VAR_INPUT               : 'VAR_INPUT';
+VAR_IN_OUT              : 'VAR_IN_OUT';
+VAR_TEMP                : 'VAR_TEMP';
+WHILE                   : 'WHILE';
+WITH                    : 'WITH';
+
+
+/******
+ * Operators
+ */
+
+AND                     :'AND';
+ARROW_RIGHT             : '=>';
+ASSIGN                  :':=';
+COMMA                   : ',';
+DIV                     :'/';
+EQUALS                  : '=';
+GREATER_EQUALS          :'>=';
+GREATER_THAN            :'>';
+LBRACKET                :'[';
+LESS_EQUALS             : '<=';
+LESS_THAN               :'<';
+LPAREN                  : '(';
+MINUS                   : '-';
+MOD                     :'MOD';
+MULT                    :'*';
+NOT                     : 'NOT';
+NOT_EQUALS              :'<>';
+OR                      :'OR';
+PLUS                    : '+';
+POWER                   :'**';
+RBRACKET                :']';
+RPAREN                  : ')';
+XOR                     :'XOR';
+
+
+/*******
+ * Constants
+ */
+
+AMPERSAND               :'&';
+BIT                     : '1' | '0';
+DOLLAR                  :'$';
+DQUOTE                  :'"';
+FALSE                   : 'FALSE';
+SEMICOLON               :';';
+SQUOTE                  :'\'';
+TRUE                    : 'TRUE';
+DOT                     : '.';
+RANGE                   :  '..';
+
+//Ignore
+WS                      : [ \r\t\n] -> skip;
+COMMENT                 : '(*' ~[] '*)';
+
+
+IDENTIFIER              : [a-zA-Z] [a-zA-Z0-9_]*;
+
+/************************************************/
 
 start : library_element_declaration+;
 
@@ -229,193 +266,23 @@ library_element_declaration
     | configuration_declaration
     ;
 
-
 constant    
-    : numeric_literal 
-    | character_string 
-    | time_literal
-    | bit_string_literal 
-    | boolean_literal
-    ;
-
-numeric_literal 
-    : integer_literal 
-    | real_literal
-    ;
-
-integer_literal 
-    : (integer_type_name HASH)
-      ( signed_integer
-      | binary_integer
-      | octal_integer
-      | hex_integer )
-    ;
-
-unsigned_integer 
-    : (PLUS | MINUS)? INTEGER_LITERAL
-    ;
-
-signed_integer 
-    : (PLUS | MINUS)? INTEGER_LITERAL
-    ;
-
-integer 
-    : INTEGER_LITERAL
-    ;
-
-binary_integer 
-    : BINARY_LITERAL
-    ;
-
-octal_integer 
-    : OCTAL_LITERAL
-    ;
-
-hex_integer 
-    : HEX_LITERAL
-    ;
-
-real_literal 
-    : real_type_name? REAL_LITERAL
-    ;
-
-bit_string_literal
-    : (BYTEH | WORDH | DWORDH | LWORDH)?
-      ( unsigned_integer
-      | binary_integer 
-      | octal_integer 
-      | hex_integer )
-    ;
-
-boolean_literal     
-    : BOOLH? BIT
-    | TRUE 
+    : integer
+    | real
+    | string
+    | time
+    | timeofday
+    | date
     | FALSE
+    | TRUE
     ;
 
-character_string
-    : single_byte_character_string
-    | double_byte_character_string
-    ;
-
-single_byte_character_string 
-    : SQUOTE (single_byte_character_representation)* SQUOTE
-    ;
-
-double_byte_character_string 
-    : DQUOTE (double_byte_character_representation)* DQUOTE
-    ;
-
-single_byte_character_representation
-    : common_character_representation
-    | DOLLAR_SQUOTE 
-    | DQUOTE
-    | CHARACTER_LITERAL_2BYTE
-    ;
-
-double_byte_character_representation 
-    : common_character_representation
-    | DOLLAR_DQUOTE 
-    | SQUOTE
-    | CHARACTER_LITERAL_4BYTE
-    ;
-
-common_character_representation 
-    : ~( DQUOTE | SQUOTE | DOLLAR)
-    | DOLLAR_DOLLAR
-    | DOLLAR_L
-    | DOLLAR_N
-    | DOLLAR_P
-    | DOLLAR_R
-    | DOLLAR_T
-    | DOLLAR_l
-    | DOLLAR_n
-    | DOLLAR_p
-    | DOLLAR_r
-    | DOLLAR_t
-    ;
-
-time_literal 
-    : duration 
-    | time_of_day
-    ;
-
-duration 
-    : (T | TIME ) HASH (MINUS)? interval
-    ;
-
-interval 
-    : days 
-    | hours 
-    | minutes 
-    | seconds 
-    | milliseconds
-    ;
-
-
-days 
-    : DAY_LITERAL (UNDERSCORE)? hours
-    ;
-
-hours 
-    : HOURS_LITERAL UNDERSCORE? minutes
-    ;
-
-minutes 
-    : MINUTES_LITERAL UNDERSCORE? seconds
-    ;
-
-seconds 
-    : SECONDS_LITERAL UNDERSCORE? milliseconds
-    ;
-
-milliseconds 
-    : MILLIESECONDS_LITERAL
-    ;
-
-time_of_day 
-    : (TIME_OF_DAY | TOD) daytime
-    ;
-
-daytime 
-    : day_hour COLON day_minute COLON day_second
-    ;
-
-day_hour 
-    : integer
-    ;
-
-day_minute 
-    : integer
-    ;
-
-day_second 
-    : integer
-    ;
-
-date 
-    : (DATEH|DH) date_literal
-    ;
-
-date_literal 
-    : year MINUS month MINUS day
-    ;
-
-year 
-    : integer
-    ;
-
-month 
-    : integer
-    ;
-
-day 
-    : integer
-    ;
-
-date_and_time 
-    : (DATE_AND_TIME | DT) HASH date_literal MINUS daytime
-    ;
+integer  : INTEGER_LITERAL;
+real     : REAL_LITERAL;
+string   : WSTRING|STRING;
+time     : TIME_LITERAL;
+timeofday: TOD_LITERAL;
+date     : DATE_LITERAL;
 
 data_type_name 
     : non_generic_type_name | generic_type_name
@@ -435,8 +302,15 @@ elementary_type_name
     | TIME
     ;
 
-numeric_type_name : integer_type_name | real_type_name;
-integer_type_name : signed_integer_type_name | unsigned_integer_type_name;
+numeric_type_name
+    : integer_type_name
+    | real_type_name
+    ;
+
+integer_type_name
+    : signed_integer_type_name
+    | unsigned_integer_type_name
+    ;
 
 signed_integer_type_name 
     : SINT
@@ -452,8 +326,12 @@ unsigned_integer_type_name
     | ULINT
     ;
 
-
 real_type_name
+    : REAL
+    | LREAL
+    ;
+
+real_type_cast
     : REALH
     | LREALH
     ;
@@ -461,7 +339,6 @@ real_type_name
 date_type_name  
     : DATE
     | TIME_OF_DAY
-    | TOD
     | DATE_AND_TIME
     | DT
     ;
@@ -556,7 +433,7 @@ subrange_type_declaration
     ;
 
 subrange_spec_init 
-    : subrange_specification(ASSIGN signed_integer)?
+    : subrange_specification (ASSIGN INTEGER_LITERAL)?
     ;
 
 subrange_specification 
@@ -565,7 +442,7 @@ subrange_specification
     ;
 
 subrange 
-    : signed_integer RANGE  signed_integer
+    : INTEGER_LITERAL RANGE INTEGER_LITERAL
     ;
 
 enumerated_type_declaration 
@@ -608,6 +485,8 @@ array_initial_elements
     : array_initial_element 
     | integer LPAREN(array_initial_element)? RPAREN
     ;
+
+
 
 array_initial_element 
     : constant
@@ -668,8 +547,8 @@ string_type_name
 string_type_declaration 
     : string_type_name COLON 
       (STRING|WSTRING) 
-      ( LBRACKET integer RBRACKET)?
-      (ASSIGN character_string)?
+      (LBRACKET integer RBRACKET)?
+      (ASSIGN string)?
     ;
 
 variable 
@@ -686,24 +565,12 @@ variable_name
     : IDENTIFIER
     ;
 
+
 direct_variable 
-    : PERCENT location_prefix size_prefix integer (DOT integer)*
+    : DIRECT_VARIABLE_LITERAL
     ;
 
-location_prefix 
-    : I 
-    | Q 
-    | M
-    ;
-
-size_prefix 
-    : NIL /* maybe wrong, paper unclear */
-    | X 
-    | B 
-    | W 
-    | D 
-    | L
-    ;
+DIRECT_VARIABLE_LITERAL: '%' [IQM] [XBWDL]? FIXED_POINT;
 
 subscript_list 
     : LBRACKET subscript (COMMA subscript)* RBRACKET
@@ -870,8 +737,7 @@ located_var_spec_init
     | enumerated_spec_init
     | array_spec_init
     | initialized_structure
-    | single_byte_string_spec
-    | double_byte_string_spec
+    | string_var_declaration
     ;
 
 location 
@@ -883,27 +749,11 @@ global_var_list
     ;
 
 string_var_declaration 
-    : single_byte_string_var_declaration 
-    | double_byte_string_var_declaration
+    : var1_list COLON (WSTRING|STRING)
+      (LBRACKET integer RBRACKET)?
+      (ASSIGN (WSTRING_LITERAL | STRING_LITERAL))?
     ;
 
-single_byte_string_var_declaration 
-    : var1_list COLON single_byte_string_spec
-    ;
-
-single_byte_string_spec 
-    : STRING (LBRACKET integer RBRACKET)? 
-      (ASSIGN single_byte_character_string)?
-    ;
-
-double_byte_string_var_declaration 
-    : var1_list COLON double_byte_string_spec
-    ;
-
-double_byte_string_spec 
-    : WSTRING (LBRACKET integer RBRACKET)? 
-      (ASSIGN double_byte_character_string)?
-    ;
 
 incompl_located_var_declarations 
     : VAR (RETAIN|NON_RETAIN)?
@@ -913,11 +763,7 @@ incompl_located_var_declarations
     ;
 
 incompl_located_var_decl 
-    : variable_name incompl_location COLON var_spec
-    ;
-
-incompl_location 
-    : AT PERCENT (I | Q | M ) MULT
+    : variable_name INCOMPL_LOCATION_LITERAL COLON var_spec
     ;
 
 var_spec 
@@ -1201,6 +1047,21 @@ instance_specific_init
                    structure_initialization))
     ;
 
+
+expr
+    : unary_expression? primary_expression // IA
+    | expr XOR expr
+    | expr OR expr
+    | expr AND expr
+    | expr (EQUALS | NOT_EQUALS) expr
+    | expr comparison_operator expr
+    | expr (PLUS|MINUS) expr
+    | expr (MULT) expr
+    |<assoc=right>
+      expr (MOD|DIV) expr
+    | expr POWER expr
+    ;
+
 expression 
     : xor_expression (OR xor_expression)*
     ;
@@ -1293,8 +1154,8 @@ fb_invocation
     ;
 
 param_assignment 
-    : ((variable_name ASSIGN)+ expression)
-    | ((NOT)+ variable_name ARROW_RIGHT variable)
+    : (variable_name ASSIGN)+ expression
+    | variable_name ARROW_RIGHT variable
     ;
 
 selection_statement 
@@ -1325,7 +1186,7 @@ case_list
 
 case_list_element 
     : subrange 
-    | signed_integer 
+    | integer
     | enumerated_value
     ;
 

@@ -10,7 +10,6 @@ import java.io.Reader;
 import java.io.StringReader;
 
 
-
 public class MyTestRig extends TestRig {
     public MyTestRig(String input, String rule) throws Exception {
         super(new String[]{"edu.kit.iti.structuredtext.StructuredText", rule});

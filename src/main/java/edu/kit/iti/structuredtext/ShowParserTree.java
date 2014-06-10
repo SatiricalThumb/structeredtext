@@ -14,7 +14,6 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by weigla on 07.06.2014.
