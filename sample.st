@@ -16,3 +16,9 @@ FUNCTION_BLOCK Testblock
 
 END_FUNCTION_BLOCK
 
+
+PROGRAM test
+
+    Testblock(number_of_boxes := 1);
+    
+END_PROGRAM
