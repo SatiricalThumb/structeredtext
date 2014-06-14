@@ -308,8 +308,8 @@ constant
 
 boolc
     locals [ ScalarValue<AnyBit.Bool, Bits> ast]
-    : (FALSE | TRUE)
-    {  $ast = ValueFactory.makeBool($boolc.text); }
+    : tok=(FALSE | TRUE)
+    {  $ast = ValueFactory.makeBool($tok.text); }
     ;
 
 cast

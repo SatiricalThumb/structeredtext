@@ -11,8 +11,11 @@ public class IfStatement extends Statement {
     private StatementList elseBranch = new StatementList();
 
 
-    public void addGuardedCommand(Expression ast, StatementList ast1) {
-        conditionalBranches.add(new GuardedStatement(ast,ast1));
+    public void addGuardedCommand(Expression expr, StatementList statements) {
+    	if(expr == null) 
+    		throw new IllegalArgumentException();
+    	
+        conditionalBranches.add(new GuardedStatement(expr,statements));
     }
 
     public void setElseBranch(StatementList elseBranch) {

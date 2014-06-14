@@ -13,7 +13,19 @@ import edu.kit.iti.structuredtext.datatypes.values.Value;
 public class VariableBinding extends Variable{
     private ScalarValue< ?extends Any, ?> value;
 
-    public ScalarValue<?extends Any,?> getValue() {
+    
+    public VariableBinding() 
+    {
+
+    }
+    
+    public VariableBinding(String name) 
+    {
+    	
+    
+    }
+
+	public ScalarValue<?extends Any,?> getValue() {
         return value;
     }
 }

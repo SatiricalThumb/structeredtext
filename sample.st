@@ -19,6 +19,10 @@ END_FUNCTION_BLOCK
 
 PROGRAM test
 
+	IF TRUE THEN
+        print("Test");
+    END_IF;
+
     Testblock(number_of_boxes := 1);
     
 END_PROGRAM

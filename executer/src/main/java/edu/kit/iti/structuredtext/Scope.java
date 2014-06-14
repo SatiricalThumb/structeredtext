@@ -1,10 +1,12 @@
 package edu.kit.iti.structuredtext;
 
+import edu.kit.iti.structuredtext.ast.FunctionBlockDeclaration;
 import edu.kit.iti.structuredtext.datatypes.Any;
+import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
 import edu.kit.iti.structuredtext.functions.Operator;
 import edu.kit.iti.structuredtext.runtime.Function;
+import edu.kit.iti.structuredtext.runtime.UserFunction;
 import edu.kit.iti.structuredtext.runtime.VariableBinding;
-import org.apache.commons.collections.map.MultiKeyMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +16,6 @@ import java.util.Map;
  */
 public class Scope {
 
-    private static MultiKeyMap mkm;
     private ChainMap<String, VariableBinding> variables = new ChainMap<>();
     private ChainMap<String, Function> functions = new ChainMap<>();
     private ChainMap<String, Any> dataTypes = new ChainMap<>();
@@ -49,11 +50,29 @@ public class Scope {
     }
 
     public VariableBinding getVariable(String name){
-        return variables.get(name);
+        //return variables.get(name);
+    	return new VariableBinding();
     }
 
     public Any getDataType(String name) {
         return dataTypes.get(name);
     }
+
+	public void declareFunction(FunctionBlockDeclaration fbd) 
+	{
+		System.out.println("Decleare Function: " + fbd.getFunctionBlockName());
+		Function func = new UserFunction(fbd);
+		functions.put(func.getFunctionName(), func);
+	}
+
+	public void declareVariable(String name) {
+		variables.put(name, new VariableBinding(name));
+		
+	}
+
+	public void declareVariable(String key, ScalarValue<?, ?> eval) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

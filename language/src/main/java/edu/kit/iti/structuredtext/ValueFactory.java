@@ -88,7 +88,7 @@ public class ValueFactory {
     }
 
     public static ScalarValue<AnyBit.Bool,Bits> makeBool(String text) {
-        return null;//TODO
+        return new ScalarValue<AnyBit.Bool, Bits>(AnyBit.BOOL, new Bits(text.equals("TRUE")?1:0, 1));//TODO
 
     }
 
