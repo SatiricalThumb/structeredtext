@@ -1,9 +1,11 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitor;
+
 /**
  * Created by weigl on 13.06.14.
  */
-public class TypeDeclaration<T> {
+public abstract class TypeDeclaration<T> {
     protected String typeName;
     protected String baseTypeName;
     protected T initializationValue;
@@ -23,12 +25,12 @@ public class TypeDeclaration<T> {
         this.typeName = typeName;
     }
 
-    public void setBaseTypeName(String baseTypeName) {
-        this.baseTypeName = baseTypeName;
-    }
-
     public String getBaseTypeName() {
         return baseTypeName;
+    }
+
+    public void setBaseTypeName(String baseTypeName) {
+        this.baseTypeName = baseTypeName;
     }
 
     public T getInitializationValue() {
@@ -38,4 +40,6 @@ public class TypeDeclaration<T> {
     public void setInitializationValue(T initializationValue) {
         this.initializationValue = initializationValue;
     }
+
+    public abstract  <S> S visit(Visitor<S> visitor);
 }

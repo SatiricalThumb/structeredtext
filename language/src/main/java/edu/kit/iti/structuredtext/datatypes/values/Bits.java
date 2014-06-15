@@ -13,8 +13,8 @@ public class Bits {
     }
 
     public Bits(long register, long nbits) {
-        this.register = register & allMask(); // trunc
         this.nbits = nbits;
+        this.register = register & allMask(); // trunc
     }
 
     private long allMask() {
@@ -81,4 +81,32 @@ public class Bits {
         return new Bits(register ^ other.register, nbits);
     }
 
+
+    @Override
+    public String toString() {
+        return "Bits{" +
+                "register=" + register +
+                ", nbits=" + nbits +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Bits)) return false;
+
+        Bits bits = (Bits) o;
+
+        if (nbits != bits.nbits) return false;
+        if (register != bits.register) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (register ^ (register >>> 32));
+        result = 31 * result + (int) (nbits ^ (nbits >>> 32));
+        return result;
+    }
 }

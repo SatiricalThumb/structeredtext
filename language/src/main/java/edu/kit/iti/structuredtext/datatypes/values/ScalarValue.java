@@ -1,5 +1,6 @@
 package edu.kit.iti.structuredtext.datatypes.values;
 
+import edu.kit.iti.structuredtext.Visitor;
 import edu.kit.iti.structuredtext.ast.Expression;
 import edu.kit.iti.structuredtext.ast.Initialization;
 import edu.kit.iti.structuredtext.datatypes.Any;
@@ -33,5 +34,10 @@ public class ScalarValue<T extends Any, S> extends Expression implements Value<T
 
     public void setValue(S value) {
         this.value = value;
+    }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

@@ -1,8 +1,8 @@
 package edu.kit.iti.structuredtext.datatypes.values;
 
 public class DateAndTimeValue {
-    private DateValue date;
-    private TimeOfDayValue tod;
+    private DateValue date = new DateValue();
+    private TimeOfDayValue tod = new TimeOfDayValue();
 
     public DateAndTimeValue(DateValue date, TimeOfDayValue tod) {
         this.date = date;
@@ -16,6 +16,50 @@ public class DateAndTimeValue {
         setHours(hours);
         setMinutes(minutes);
         setSeconds(seconds);
+    }
+
+    @Override
+    public String toString() {
+        return "DateAndTimeValue{" +
+                "date=" + date +
+                ", tod=" + tod +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DateAndTimeValue)) return false;
+
+        DateAndTimeValue that = (DateAndTimeValue) o;
+
+        if (!date.equals(that.date)) return false;
+        if (!tod.equals(that.tod)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = date.hashCode();
+        result = 31 * result + tod.hashCode();
+        return result;
+    }
+
+    public DateValue getDate() {
+        return date;
+    }
+
+    public void setDate(DateValue date) {
+        this.date = date;
+    }
+
+    public TimeOfDayValue getTod() {
+        return tod;
+    }
+
+    public void setTod(TimeOfDayValue tod) {
+        this.tod = tod;
     }
 
     public void setSeconds(int seconds) {
@@ -64,5 +108,9 @@ public class DateAndTimeValue {
 
     public int getMonth() {
         return date.getMonth();
+    }
+
+    public int getMillieSeconds() {
+        return tod.getMillieseconds();
     }
 }

@@ -1,5 +1,7 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,14 +14,10 @@ public class IfStatement extends Statement {
 
 
     public void addGuardedCommand(Expression expr, StatementList statements) {
-    	if(expr == null) 
-    		throw new IllegalArgumentException();
-    	
-        conditionalBranches.add(new GuardedStatement(expr,statements));
-    }
+        if (expr == null)
+            throw new IllegalArgumentException();
 
-    public void setElseBranch(StatementList elseBranch) {
-        this.elseBranch = elseBranch;
+        conditionalBranches.add(new GuardedStatement(expr, statements));
     }
 
     public List<GuardedStatement> getConditionalBranches() {
@@ -32,5 +30,14 @@ public class IfStatement extends Statement {
 
     public StatementList getElseBranch() {
         return elseBranch;
+    }
+
+    public void setElseBranch(StatementList elseBranch) {
+        this.elseBranch = elseBranch;
+    }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

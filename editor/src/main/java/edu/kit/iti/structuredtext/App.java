@@ -1,6 +1,5 @@
 package edu.kit.iti.structuredtext;
 
-import com.sun.java.swing.plaf.gtk.GTKLookAndFeel;
 import edu.kit.iti.structuredtext.ui.MainFrame;
 import edu.kit.iti.structuredtext.ui.STTokenMaker;
 import edu.kit.iti.structuredtext.ui.StructuredTextFoldParser;
@@ -24,10 +23,8 @@ public class App {
             public void run() {
 
                 try {
-                    UIManager.setLookAndFeel(new GTKLookAndFeel());
-                } catch (UnsupportedLookAndFeelException e) {
-                    e.printStackTrace();
-                }
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+                } catch (Exception e) {}
 
                 FoldParserManager.get().addFoldParserMapping("text/structuredtext", new StructuredTextFoldParser());
 

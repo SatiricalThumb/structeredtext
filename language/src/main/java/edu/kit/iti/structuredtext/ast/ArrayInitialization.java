@@ -1,6 +1,6 @@
 package edu.kit.iti.structuredtext.ast;
 
-import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
+import edu.kit.iti.structuredtext.Visitor;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -11,8 +11,12 @@ import java.util.stream.Stream;
 /**
  * Created by weigl on 13.06.14.
  */
-public class ArrayInitialization implements Initialization, List<Initialization>{
+public class ArrayInitialization implements Initialization, List<Initialization> {
     private List<Initialization> initValues = new ArrayList<>();
+
+    public void visit(Visitor visitor) {
+        visitor.visit(this);
+    }
 
     @Override
     public boolean add(Initialization initialization) {

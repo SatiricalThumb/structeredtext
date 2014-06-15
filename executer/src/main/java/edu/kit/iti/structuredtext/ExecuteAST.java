@@ -3,7 +3,6 @@ package edu.kit.iti.structuredtext;
 import edu.kit.iti.structuredtext.ast.*;
 import edu.kit.iti.structuredtext.datatypes.AnyBit;
 import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
-import edu.kit.iti.structuredtext.runtime.ExpressionVisitor;
 import edu.kit.iti.structuredtext.runtime.Function;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.velocity.exception.MethodInvocationException;
 
 /**
  * Created by weigl on 13.06.14.
@@ -22,7 +20,6 @@ public class ExecuteAST {
 
 	Scope scope = new Scope();
 
-	ExpressionVisitor exprEval = new ExpressionVisitor(scope);
 
 	@SuppressWarnings("unchecked")
 	public Object visit(Object obj) {		
@@ -180,26 +177,26 @@ public class ExecuteAST {
 			scope.declareVariable(name);
 		}
 		
-		Map<String, Expression> inputVariables = fcs.getFunctionBlockCall().getInputParameters();
-		for(Map.Entry<String, Expression> input : inputVariables.entrySet())
+		/*for(Map.Entry<String, Expression> input : inputVariables.entrySet())
 		{
 			Expression value = input.getValue();
 			if(value != null)
-				scope.declareVariable(input.getKey(), exprEval.eval(value));
+				//scope.declareVariable(input.getKey(), exprEval.eval(value));
+                return null;
 			else 
 				scope.declareVariable(input.getKey());
 		}
 		
 		func.execute(this);
 		scope.pop();  //clear local variables
-		
+		*/
 		return null;
 	}
 
 	public boolean visit(GuardedStatement gs) {
 		Expression cond = gs.getCondition();
 
-		ScalarValue<AnyBit.Bool, Boolean> bool = (ScalarValue<AnyBit.Bool, Boolean>) exprEval
+		/*ScalarValue<AnyBit.Bool, Boolean> bool = (ScalarValue<AnyBit.Bool, Boolean>) exprEval
 				.eval(cond);
 
 		if (bool.getValue()) {
@@ -207,7 +204,9 @@ public class ExecuteAST {
 			return true;
 		} else {
 			return false;
-		}
+		}*/
+        return true
+                ;
 	}
 
 }

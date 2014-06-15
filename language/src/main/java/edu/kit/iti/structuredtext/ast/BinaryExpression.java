@@ -1,51 +1,19 @@
 package edu.kit.iti.structuredtext.ast;
 
-import edu.kit.iti.structuredtext.antlr.StructuredTextParser;
+import edu.kit.iti.structuredtext.Visitor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BinaryExpression extends Expression {
-    public static enum Operator {
-        //airthmetic
-        ADD("+"),
-        MULT("*"),
-        SUB("-"),
-        DIV("/"),
-        MOD("MOD"),
-
-        //logical
-        AND("AND"),
-        OR("OR"),
-        XOR("XOR"),
-
-        //comparison
-        EQUALS("="),
-        NOT_EQUALS("<>"),
-
-        POWER("**"),
-
-        LESS_THAN("<"),
-        GREATER_THAN(">"),
-        GREATER_EQUALS(">="),
-        LESS_EQUALS("<=");
-
-        public final String token;
-        Operator(String t) {
-            token = t;
-        }
-    }
-
     public static final Map<String, Operator> OPERATOR_MAP = new HashMap<>();
     static {
-        for(Operator o : Operator.values()){
-            OPERATOR_MAP.put(o.token,o);
+        for (Operator o : Operator.values()) {
+            OPERATOR_MAP.put(o.token, o);
         }
     }
-
     private Expression leftExpr, rightExpr;
     private Operator operator;
-
     public BinaryExpression(Expression leftExpr, Expression rightExpr, Operator operator) {
         this.leftExpr = leftExpr;
         this.rightExpr = rightExpr;
@@ -84,5 +52,40 @@ public class BinaryExpression extends Expression {
 
     public void setOperator(Operator operator) {
         this.operator = operator;
+    }
+
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    public static enum Operator {
+        //airthmetic
+        ADD("+"),
+        MULT("*"),
+        SUB("-"),
+        DIV("/"),
+        MOD("MOD"),
+
+        //logical
+        AND("AND"),
+        OR("OR"),
+        XOR("XOR"),
+
+        //comparison
+        EQUALS("="),
+        NOT_EQUALS("<>"),
+
+        POWER("**"),
+
+        LESS_THAN("<"),
+        GREATER_THAN(">"),
+        GREATER_EQUALS(">="),
+        LESS_EQUALS("<=");
+
+        public final String token;
+
+        Operator(String t) {
+            token = t;
+        }
     }
 }

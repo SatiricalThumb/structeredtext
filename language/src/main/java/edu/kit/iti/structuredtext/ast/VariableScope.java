@@ -1,28 +1,25 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitor;
 import edu.kit.iti.structuredtext.datatypes.AnyInt;
-import edu.kit.iti.structuredtext.datatypes.EnumerateType;
 import edu.kit.iti.structuredtext.datatypes.IECString;
 import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created by weigl on 13.06.14.
  */
 public class VariableScope {
-    private Map<String, Variable> variableMap = new HashMap<>();
+    private Map<String, VariableDeclaration> variableMap = new HashMap<>();
     private Stack<Integer> stack = new Stack<>();
 
 
-    public Map<String, Variable> getVariableMap() {
+    public Map<String, VariableDeclaration> getVariableMap() {
         return variableMap;
     }
 
-    public void setVariableMap(Map<String, Variable> variableMap) {
+    public void setVariableMap(Map<String, VariableDeclaration> variableMap) {
         this.variableMap = variableMap;
     }
 
@@ -34,11 +31,12 @@ public class VariableScope {
         stack.clear();
     }
 
-    public void clear(int i){
-        clear();push(i);
+    public void clear(int i) {
+        clear();
+        push(i);
     }
 
-    public void mix(int i){
+    public void mix(int i) {
         push(stack.pop() | i);
     }
 
@@ -47,20 +45,18 @@ public class VariableScope {
     }
 
 
-    private void add(Variable var) {
+    private void add(VariableDeclaration var) {
         variableMap.put(var.getName(), var);
     }
 
-    public void create(List<String> names, TypeDeclaration<?> init)
-    {
-        for(String name : names) {
-            Variable var = new Variable(name, stack.peek(), init);
+    public void create(List<String> names, TypeDeclaration<?> init) {
+        for (String name : names) {
+            VariableDeclaration var = new VariableDeclaration(name, peek(), init);
             add(var);
         }
     }
 
-    public void createFBName(List<String> names, String s, StructureInitialization init)
-    {
+    public void createFBName(List<String> names, String s, StructureInitialization init) {
         throw new AssertionError("i do not know what this construct means");
         /*for(String name : names) {
             Variable var = new Variable(name, stack.peek(), init);
@@ -70,18 +66,17 @@ public class VariableScope {
     }
 
 
-
     public void create(List<String> names, StructureInitialization init) {
-        for(String name : names) {
-            Variable var = new Variable(name, stack.peek(), init);
+        for (String name : names) {
+            VariableDeclaration var = new VariableDeclaration(name, peek(), init);
             var.setDataType(init.getStructureName());
             add(var);
         }
     }
 
     public void create(List<String> names, ScalarValue<?, ?> init) {
-        for(String name : names) {
-            Variable var = new Variable(name, stack.peek(), init);
+        for (String name : names) {
+            VariableDeclaration var = new VariableDeclaration(name, peek(), init);
             add(var);
         }
     }
@@ -92,20 +87,31 @@ public class VariableScope {
     }
 
 
-    public void create(List<String> ast, ScalarValue<? extends AnyInt, Integer> length, ScalarValue<? extends IECString, String> def) {
-        for(String name : ast) {
-            Variable var = new StringVariable(name, stack.peek(), length, def);
+    public void create(List<String> ast, ScalarValue<? extends AnyInt, Long> length, ScalarValue<? extends IECString, String> def) {
+        for (String name : ast) {
+            VariableDeclaration var = new StringVariable(name, peek(), length, def);
             add(var);
         }
     }
 
+    private int peek() {
+        try {
+            return stack.peek();
+        } catch (EmptyStackException e) {
+            return 0;
+        }
+    }
 
-    public void create(List<String> ast, String baseType)
-    {
-        for(String name : ast) {
-            Variable var = new Variable(name, stack.peek());
+
+    public void create(List<String> ast, String baseType) {
+        for (String name : ast) {
+            VariableDeclaration var = new VariableDeclaration(name, peek());
             var.setDataType(baseType);
             add(var);
         }
+    }
+
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

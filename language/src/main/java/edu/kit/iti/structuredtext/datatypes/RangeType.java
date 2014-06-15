@@ -35,4 +35,9 @@ public class RangeType extends Any{
     public void setBase(AnyInt base) {
         this.base = base;
     }
+
+    @Override
+    public String repr(Object obj) {
+        return base.repr(obj);
+    }
 }

@@ -22,6 +22,11 @@ public class RecordType extends Any {
         fields.add(new Field(name, dataType));
     }
 
+    @Override
+    public String repr(Object obj) {
+        return null;
+    }
+
     public class Field {
         private String name;
         private Any dataType;

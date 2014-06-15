@@ -1,12 +1,10 @@
 package edu.kit.iti.structuredtext.ast;
 
 
-import edu.kit.iti.structuredtext.datatypes.Any;
-
 /**
  * Created by weigla on 09.06.2014.
  */
-public class Variable {
+public class VariableDeclaration {
     public static final int INPUT = 1;
     public static final int OUTPUT = 2;
     public static final int INOUT = 4;
@@ -25,26 +23,26 @@ public class Variable {
     private String dataType;
     private int type;
 
-    public Variable() {
+    public VariableDeclaration() {
 
     }
 
-    public Variable(String name) {
+    public VariableDeclaration(String name) {
         this();
         this.name = name;
     }
 
-    public Variable(String name, int type, Initialization i) {
+    public VariableDeclaration(String name, int type, Initialization i) {
         this(name, type);
         init = i;
     }
 
-    public Variable(String name, int type, TypeDeclaration<?> i) {
+    public VariableDeclaration(String name, int type, TypeDeclaration<?> i) {
         this(name, type);
         declaredType = i;
     }
 
-    public Variable(String name, Integer type) {
+    public VariableDeclaration(String name, Integer type) {
         this(name);
         this.type = type;
     }

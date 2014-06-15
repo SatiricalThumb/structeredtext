@@ -42,4 +42,9 @@ public class EnumerateType extends Any {
     public void setDefValue(String defValue) {
         this.defValue = defValue;
     }
+
+    @Override
+    public String repr(Object obj) {
+        return name + "#" + obj;
+    }
 }

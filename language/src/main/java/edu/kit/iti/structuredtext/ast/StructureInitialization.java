@@ -1,7 +1,5 @@
 package edu.kit.iti.structuredtext.ast;
 
-import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,14 +20,14 @@ public class StructureInitialization implements Initialization {
     }
 
     public void addField(String s, Initialization init) {
-        initValues.put(s,init);
-    }
-
-    public void setStructureName(String structureName) {
-        this.structureName = structureName;
+        initValues.put(s, init);
     }
 
     public String getStructureName() {
         return structureName;
+    }
+
+    public void setStructureName(String structureName) {
+        this.structureName = structureName;
     }
 }

@@ -1,5 +1,6 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitor;
 import edu.kit.iti.structuredtext.datatypes.EnumerateType;
 import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
 
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  * Created by weigl on 13.06.14.
  */
-public class StructureTypeDeclaration extends TypeDeclaration {
+public class StructureTypeDeclaration extends TypeDeclaration<Object> {
     Map<String, TypeDeclaration> fields = new HashMap<>();
 
     public void addField(String s, SimpleTypeDeclaration ast) {
@@ -29,5 +30,10 @@ public class StructureTypeDeclaration extends TypeDeclaration {
 
     public void addField(String s, StructureInitialization ast) {
 
+    }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

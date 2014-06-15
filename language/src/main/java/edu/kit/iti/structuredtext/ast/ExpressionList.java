@@ -1,5 +1,7 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitor;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -170,5 +172,10 @@ public class ExpressionList extends Expression implements List<Expression> {
     @Override
     public void forEach(Consumer<? super Expression> action) {
         expressions.forEach(action);
+    }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

@@ -1,8 +1,12 @@
 package edu.kit.iti.structuredtext.datatypes;
 
-public class AnyInt extends AnyNum {
-
+public abstract class AnyInt extends AnyNum {
     public static final Integer DEFAULT = 0;
+
+    @Override
+    public String repr(Object obj) {
+        return getClass().getSimpleName().toUpperCase()+"#"+obj;
+    }
 
     public final static class SInt extends AnyInt {
         private SInt() {
@@ -38,7 +42,6 @@ public class AnyInt extends AnyNum {
         }
     }
 
-
     public final static class USInt extends AnyInt {
         private USInt() {
             super(8, true);
@@ -65,7 +68,7 @@ public class AnyInt extends AnyNum {
 
 
     public static final SInt SINT = new SInt();
-    public static final USInt SUInt = new USInt();
+    public static final USInt USINT = new USInt();
     public static final Int INT = new Int();
     public static final AnyInt UINT = new UInt();
     public static final UDInt UDINT = new UDInt();
@@ -90,5 +93,21 @@ public class AnyInt extends AnyNum {
         long max = (2 << bitLength) - 1;
         long min = -(2 << bitLength);
         return value <= max && value >= min;
+    }
+
+    public int getBitLength() {
+        return bitLength;
+    }
+
+    public void setBitLength(int bitLength) {
+        this.bitLength = bitLength;
+    }
+
+    public boolean isSigned() {
+        return signed;
+    }
+
+    public void setSigned(boolean signed) {
+        this.signed = signed;
     }
 }

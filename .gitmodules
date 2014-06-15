@@ -1,0 +1,3 @@
+[submodule "gunit-maven-plugin"]
+	path = gunit-maven-plugin
+	url = https://github.com/areku/gunit-maven-plugin.git

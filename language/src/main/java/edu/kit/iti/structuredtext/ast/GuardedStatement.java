@@ -1,5 +1,7 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitor;
+
 import java.util.List;
 
 /**
@@ -7,13 +9,13 @@ import java.util.List;
  */
 public class GuardedStatement extends Statement {
     protected Expression condition;
-    protected List<Statement> statements;
+    protected StatementList statements;
 
     public GuardedStatement() {
 
     }
 
-    public GuardedStatement(Expression condition, List<Statement> statements) {
+    public GuardedStatement(Expression condition, StatementList statements) {
         this.condition = condition;
         this.statements = statements;
     }
@@ -27,11 +29,16 @@ public class GuardedStatement extends Statement {
     }
 
 
-    public List<Statement> getStatements() {
+    public StatementList getStatements() {
         return statements;
     }
 
-    public void setStatements(List<Statement> statements) {
+    public void setStatements(StatementList statements) {
         this.statements = statements;
+    }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 }

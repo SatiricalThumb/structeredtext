@@ -64,7 +64,12 @@ fragment
 HEX_LITERAL             : '16#' HEX_DIGIT (Underscores | Underscores HEX_DIGIT)*;
 
 
-INTEGER_LITERAL         : (UINT_TYPES|INT_TYPES|BIT_TYPES)? (OCTAL_DIGIT|BINARY_LITERAL|HEX_LITERAL|NUMBER);
+INTEGER_LITERAL         : (UINT_TYPES|INT_TYPES)? (OCTAL_DIGIT|BINARY_LITERAL|HEX_LITERAL|NUMBER);
+
+BITS_LITERAL            : (BIT_TYPES (OCTAL_DIGIT|BINARY_LITERAL|HEX_LITERAL|NUMBER))
+                        | TRUE
+                        | FALSE
+                        ;
 
 REAL_LITERAL            : (REAL_TYPES [+-]?)? FIXED_POINT ([eE] FIXED_POINT+)?;
 
@@ -301,15 +306,10 @@ constant
     | time      { $ast= $time.ctx.ast; }
     | timeofday { $ast= $timeofday.ctx.ast; }
     | date      { $ast= $date.ctx.ast; }
-    | boolc     { $ast= $boolc.ctx.ast; }
+    //| boolc     { $ast= $boolc.ctx.ast; }
     | datetime  { $ast= $datetime.ctx.ast; }
     | cast      { $ast= $cast.ctx.ast; }
-    ;
-
-boolc
-    locals [ ScalarValue<AnyBit.Bool, Bits> ast]
-    : tok=(FALSE | TRUE)
-    {  $ast = ValueFactory.makeBool($tok.text); }
+    | bits      { $ast= $bits.ctx.ast; }
     ;
 
 cast
@@ -319,9 +319,15 @@ cast
     ;
 
 integer
-    locals [ ScalarValue<? extends AnyInt, Integer> ast; ]
+    locals [ ScalarValue<? extends AnyInt, Long> ast; ]
     : INTEGER_LITERAL
     { $ast = ValueFactory.parseIntegerLiteral($INTEGER_LITERAL.text);}
+    ;
+
+bits
+    locals [ ScalarValue<? extends AnyBit, Bits> ast; ]
+    : BITS_LITERAL
+    { $ast = ValueFactory.parseBitLiteral($BITS_LITERAL.text);}
     ;
 
 real
@@ -359,7 +365,7 @@ date
 datetime
     locals [ ScalarValue<AnyDate.DateAndTime, DateAndTimeValue> ast;]
      : DATETIME
-     { $ast = ValueFactory.parseDateTime($DATETIME.text);}
+     { $ast = ValueFactory.parseDateAndTimeLiteral($DATETIME.text);}
      ;
 
 data_type_name
@@ -697,9 +703,9 @@ direct_variable
 
 input_declarations[VariableScope gather]
     @init {
-        $gather.push(Variable.INPUT);
+        $gather.push(VariableDeclaration.INPUT);
     }
-    : VAR_INPUT (RETAIN {$gather.mix(Variable.RETAIN);} | NON_RETAIN)?
+    : VAR_INPUT (RETAIN {$gather.mix(VariableDeclaration.RETAIN);} | NON_RETAIN)?
       (input_declaration[gather] SEMICOLON)+
       END_VAR
     ;
@@ -752,15 +758,15 @@ fb_name_decl[VariableScope gather]
 
 
 output_declarations[VariableScope gather]
-    @init{$gather.clear(Variable.OUTPUT);}
-    : VAR_OUTPUT ( RETAIN {$gather.mix(Variable.RETAIN);}
+    @init{$gather.clear(VariableDeclaration.OUTPUT);}
+    : VAR_OUTPUT ( RETAIN {$gather.mix(VariableDeclaration.RETAIN);}
                  | NON_RETAIN)?
       (var_init_decl[gather] SEMICOLON)+
       END_VAR
     ;
 
 input_output_declarations[VariableScope gather]
-    @init{$gather.clear(Variable.INOUT);}
+    @init{$gather.clear(VariableDeclaration.INOUT);}
     : VAR_IN_OUT
       (var_declaration[gather] SEMICOLON)+
       END_VAR
@@ -800,19 +806,21 @@ structured_var_declaration[VariableScope gather]
     ;
 
 var_declarations[VariableScope gather]
-    : VAR CONSTANT? (var_init_decl[gather] SEMICOLON)+
+    @init { $gather.clear(); }
+    : VAR (CONSTANT { $gather.mix(VariableDeclaration.CONSTANT);} )? (var_init_decl[gather] SEMICOLON)+
       END_VAR
     ;
 
 retentive_var_declarations[VariableScope gather]
+    @init { $gather.clear(VariableDeclaration.RETAIN); }
     : VAR RETAIN  (var_init_decl[gather] SEMICOLON)+
       END_VAR
     ;
 
 located_var_declarations[VariableScope gather]
-    @init { $gather.clear(Variable.LOCATED); }
-    : VAR ( CONSTANT   {$gather.mix(Variable.CONSTANT);}
-          | RETAIN     {$gather.mix(Variable.RETAIN);}
+    @init { $gather.clear(VariableDeclaration.LOCATED); }
+    : VAR ( CONSTANT   {$gather.mix(VariableDeclaration.CONSTANT);}
+          | RETAIN     {$gather.mix(VariableDeclaration.RETAIN);}
           | NON_RETAIN
           )?
       (located_var_decl[gather] SEMICOLON)+
@@ -824,26 +832,26 @@ located_var_decl[VariableScope gather]
     ;
 
 external_var_declarations[VariableScope gather]
-    @init{ $gather.clear(Variable.EXTERNAL);}
-    : VAR_EXTERNAL (CONSTANT {$gather.mix(Variable.CONSTANT);})?
+    @init{ $gather.clear(VariableDeclaration.EXTERNAL);}
+    : VAR_EXTERNAL (CONSTANT {$gather.mix(VariableDeclaration.CONSTANT);})?
       (external_declaration[gather] SEMICOLON)+
       END_VAR
     ;
 
 external_declaration[VariableScope gather]
     :IDENTIFIER COLON
-      ( simple_specification 
+      ( simple_specification
       | subrange_specification
-      | enumerated_specification 
-      | array_specification 
+      | enumerated_specification
+      | array_specification
       | IDENTIFIER
       )
     ;
 
 global_var_declarations[VariableScope gather]
-@init {$gather.push(Variable.GLOBAL);}
-    : VAR_GLOBAL    ( CONSTANT {$gather.mix(Variable.CONSTANT);}
-                    | RETAIN {$gather.mix(Variable.RETAIN);}
+@init {$gather.push(VariableDeclaration.GLOBAL);}
+    : VAR_GLOBAL    ( CONSTANT {$gather.mix(VariableDeclaration.CONSTANT);}
+                    | RETAIN {$gather.mix(VariableDeclaration.RETAIN);}
                     )?
         (global_var_decl[gather] SEMICOLON)+
       END_VAR
@@ -855,7 +863,7 @@ global_var_decl[VariableScope gather]
     ;
 
 global_var_spec[VariableScope gather]
-    : identifier_list 
+    : identifier_list
     | (IDENTIFIER)? location
     {
         //TODO
@@ -871,7 +879,7 @@ located_var_spec_init[VariableScope gather]
     | string_var_declaration[gather]
     ;
 
-location 
+location
     : AT direct_variable
     ;
 
@@ -895,22 +903,22 @@ string_var_declaration[VariableScope gather]
 
 
 incompl_located_var_declarations[VariableScope gather]
-    @init{ $gather.clear(Variable.RETAIN);}
+    @init{ $gather.clear(VariableDeclaration.RETAIN);}
     : VAR (RETAIN|NON_RETAIN)?
-      incompl_located_var_decl SEMICOLON 
-      (incompl_located_var_decl SEMICOLON)* 
+      incompl_located_var_decl SEMICOLON
+      (incompl_located_var_decl SEMICOLON)*
       END_VAR
     ;
 
-incompl_located_var_decl 
+incompl_located_var_decl
     :IDENTIFIER INCOMPL_LOCATION_LITERAL COLON var_spec
     ;
 
-var_spec 
-    : simple_specification 
-    | subrange_specification 
-    | enumerated_specification 
-    | array_specification 
+var_spec
+    : simple_specification
+    | subrange_specification
+    | enumerated_specification
+    | array_specification
     | IDENTIFIER
     | (STRING | WSTRING) (LBRACKET integer RBRACKET)?
     ;
@@ -932,7 +940,7 @@ function_declaration
         $ast.setFunctionName($name.text);
       }
     ;
-     
+
 io_var_declarations[VariableScope gather]
     : input_declarations[gather]
     | output_declarations[gather]
@@ -940,9 +948,9 @@ io_var_declarations[VariableScope gather]
     ;
 
 function_var_decls[VariableScope gather]
-    @init {$gather.push(Variable.LOCAL);}
+    @init {$gather.push(VariableDeclaration.LOCAL);}
     : VAR
-      ( CONSTANT  {$gather.mix(Variable.CONSTANT);} )?
+      ( CONSTANT  {$gather.mix(VariableDeclaration.CONSTANT);} )?
       (var2_init_decl[gather] SEMICOLON)+
       END_VAR
     {$gather.pop();}
@@ -984,7 +992,7 @@ other_var_declarations[VariableScope gather]
     ;
 
 temp_var_decls[VariableScope gather]
-    @init { $gather.clear(Variable.TEMP); }
+    @init { $gather.clear(VariableDeclaration.TEMP); }
     : VAR_TEMP
       (temp_var_decl[gather] SEMICOLON)+
       END_VAR
@@ -1017,14 +1025,14 @@ program_declaration
       }
     ;
 
-program_access_decls    
+program_access_decls
     : VAR_ACCESS
         program_access_decl SEMICOLON
         (program_access_decl SEMICOLON )*
       END_VAR
     ;
 
-program_access_decl 
+program_access_decl
     :IDENTIFIER COLON symbolic_variable COLON
         non_generic_type_name (direction)?
     ;
@@ -1050,93 +1058,93 @@ resource_declaration
       END_RESOURCE
     ;
 
-single_resource_declaration 
+single_resource_declaration
     : (task_configuration SEMICOLON)*
       program_configuration SEMICOLON
       (program_configuration SEMICOLON)*
     ;
 
 
-access_declarations 
+access_declarations
     : VAR_ACCESS
       access_declaration SEMICOLON
       (access_declaration SEMICOLON)*
       END_VAR
     ;
 
-access_declaration 
+access_declaration
     :IDENTIFIER COLON access_path COLON
       non_generic_type_name (direction)?;
 
-access_path 
+access_path
     : (IDENTIFIER DOT)? direct_variable
     | (IDENTIFIER DOT)* symbolic_variable
     ;
 
-global_var_reference 
+global_var_reference
     : (IDENTIFIER DOT)? IDENTIFIER (DOT IDENTIFIER)?
     ;
 
-program_output_reference 
+program_output_reference
     : IDENTIFIER DOT symbolic_variable
     ;
 
 
-direction 
-    : READ_WRITE 
+direction
+    : READ_WRITE
     | READ_ONLY
     ;
 
-task_configuration 
+task_configuration
     : TASK IDENTIFIER task_initialization
     ;
 
 
-task_initialization 
+task_initialization
     : LPAREN (SINGLE ASSIGN data_source COMMA)?
              (INTERVAL ASSIGN data_source COMMA)?
-             PRIORITY ASSIGN integer 
+             PRIORITY ASSIGN integer
       RPAREN
     ;
 
-data_source 
+data_source
     : constant
     | global_var_reference
     | program_output_reference
     | direct_variable
     ;
 
-program_configuration   
+program_configuration
     : PROGRAM (RETAIN | NON_RETAIN)?
         IDENTIFIER (WITH IDENTIFIER)? COLON IDENTIFIER
         ( LPAREN prog_conf_elements RPAREN)?
     ;
 
-prog_conf_elements 
+prog_conf_elements
     : prog_conf_element (COMMA prog_conf_element)*
     ;
 
-prog_conf_element 
-    : fb_task 
+prog_conf_element
+    : fb_task
     | prog_cnxn
     ;
 
-fb_task 
+fb_task
     : IDENTIFIER WITH IDENTIFIER
     ;
 
-prog_cnxn 
+prog_cnxn
     : symbolic_variable ASSIGN prog_data_source
     | symbolic_variable RIGHT_ARROW data_sink
     ;
 
-prog_data_source 
+prog_data_source
     : constant
     | global_var_reference
     | direct_variable
     ;
 
-data_sink   
+data_sink
     : global_var_reference
     | direct_variable
     ;
@@ -1157,7 +1165,7 @@ instance_specific_init[VariableScope gather]
 
 expression
     locals [
-        Expression ast = new Expression();
+        Expression ast;
     ]
 
     : MINUS sub=expression
@@ -1250,7 +1258,7 @@ statement_list
     ;
 
 statement
-    locals [ Statement ast = new Statement(); ]
+    locals [ Statement ast; ]
     : /*empty*/
     { } //empty statement
     |  assignment_statement
@@ -1266,7 +1274,7 @@ statement
     ;
 
 assignment_statement
-     locals [ Statement ast; ]
+     locals [ AssignmentStatement ast; ]
     : variable ASSIGN expression
     {
         $ast = new AssignmentStatement($variable.ctx.ast, $expression.ctx.ast);
@@ -1274,13 +1282,13 @@ assignment_statement
     ;
 
 subprogram_control_statement
-     locals [ Statement ast = new Statement(); ]
+     locals [ Statement ast; ]
     : functioncall {$ast = new FunctionCallStatement($functioncall.ctx.ast);}
     | RETURN       {$ast = new ReturnStatement();}
     ;
 
 selection_statement
-     locals [ Statement ast = new Statement(); ]
+     locals [ Statement ast; ]
     : if_statement   {$ast = $if_statement.ctx.ast;}
     | case_statement {$ast = $case_statement.ctx.ast;}
     ;
@@ -1334,7 +1342,7 @@ case_list_element
     ;
 
 iteration_statement
-    locals [ Statement ast = new Statement(); ]
+    locals [ Statement ast; ]
     : for_statement    { $ast = $for_statement.ctx.ast; }
     | while_statement  { $ast = $while_statement.ctx.ast; }
     | repeat_statement { $ast = $repeat_statement.ctx.ast; }

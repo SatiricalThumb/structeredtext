@@ -1,15 +1,18 @@
 package edu.kit.iti.structuredtext.ast;
 
 
+import edu.kit.iti.structuredtext.Visitor;
+
 /**
  * Created by weigla on 09.06.2014.
  */
-public class ForStatement  extends Statement {
+public class ForStatement extends Statement {
     private String variable;
     private Expression start, stop, step;
     private StatementList statements = new StatementList();
 
-    public ForStatement() {}
+    public ForStatement() {
+    }
 
     public ForStatement(String variable, Expression start, Expression stop, Expression step, StatementList statements) {
         this.variable = variable;
@@ -59,4 +62,8 @@ public class ForStatement  extends Statement {
         this.statements = statements;
     }
 
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
