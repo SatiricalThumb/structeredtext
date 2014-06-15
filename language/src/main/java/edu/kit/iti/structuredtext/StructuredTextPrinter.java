@@ -7,10 +7,9 @@ import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
 /**
  * Created by weigla on 15.06.2014.
  */
-public class StructuredTextPrinter implements Visitor<Object> {
-
+public class StructuredTextPrinter implements Visitor<Object>
+{
     private CodeWriter sb = new CodeWriter();
-    private int indent;
 
     public String getString() {
         return sb.toString();
