@@ -5,7 +5,9 @@ jdk:
   
   
 install:
-  - (cd gunit-maven-plugin && mvn install -DskipTests=true -B -V)
+  - cd gunit-maven-plugin
+  - mvn install -DskipTests=true -B -V
+  - cd ..
   
 script: 
   - mvn install -B -V
