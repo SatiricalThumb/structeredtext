@@ -2,4 +2,11 @@ language: java
 jdk:
   - oraclejdk7
   - oraclejdk8
+  
+os:
+  - linux
+  - osx
 
+
+install: (cd gunit-maven-plugin && mvn install -DskipTests=true -B -V -X)
+script: mvn install -B -V -X
