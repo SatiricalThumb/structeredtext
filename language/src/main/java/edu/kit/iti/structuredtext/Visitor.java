@@ -4,6 +4,8 @@ import edu.kit.iti.structuredtext.ast.*;
 import edu.kit.iti.structuredtext.datatypes.Any;
 import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
 
+import javax.swing.tree.MutableTreeNode;
+
 /**
  * Created by weigla on 14.06.2014.
  */
@@ -89,4 +91,8 @@ public interface Visitor<T> {
     T visit(SimpleTypeDeclaration simpleTypeDeclaration);
 
     T visit(VariableScope variableScope);
+
+    T visit(VariableDeclaration variableDeclaration);
+
+    T visit(TopLevelElement topLevelElement);
 }

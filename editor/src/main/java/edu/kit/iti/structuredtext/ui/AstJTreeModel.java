@@ -10,8 +10,7 @@ import javax.swing.tree.TreeNode;
  * Created by weigl on 13.06.14.
  */
 public class AstJTreeModel extends DefaultTreeModel {
-    public AstJTreeModel()
-    {
-        super(null,true);
+    public AstJTreeModel() {
+        super(null, true);
     }
 }

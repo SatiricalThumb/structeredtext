@@ -27,7 +27,7 @@ public class RSTAParser implements Parser {
     private final MainFrame.EditorPane editorPane;
 
     public RSTAParser(MainFrame.EditorPane pane) {
-        editorPane = pane;        
+        editorPane = pane;
     }
 
     @Override
@@ -47,50 +47,35 @@ public class RSTAParser implements Parser {
 
     @Override
     public ParseResult parse(RSyntaxDocument doc, String style) {
-        final DefaultParseResult parseResult = new DefaultParseResult(this);
-
         try {
             System.out.println(style);
             final String string = doc.getText(0, doc.getLength());
             StructuredTextParser parser = new StructuredTextParser(new CommonTokenStream(new StructuredTextLexer(new ANTLRInputStream(string))));
 
-            parser.addErrorListener(new ANTLRErrorListener() {
-                @Override
-                public void syntaxError(@NotNull Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line, int charPositionInLine, @NotNull String msg, @Nullable RecognitionException e) {
-                    parseResult.setError(e);
-                    e.printStackTrace();
-                }
+            ParseResultListener parseResultListener = new ParseResultListener(this);
+            parser.addErrorListener(parseResultListener);
 
-                @Override
-                public void reportAmbiguity(@NotNull org.antlr.v4.runtime.Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, boolean exact, @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs) {
-                    parseResult.addNotice(new DefaultParserNotice(RSTAParser.this, "ambiguity", getLine(string, startIndex)));
-                }
-
-                @Override
-                public void reportAttemptingFullContext(@NotNull org.antlr.v4.runtime.Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, @Nullable BitSet conflictingAlts, @NotNull ATNConfigSet configs) {
-                    parseResult.addNotice(new DefaultParserNotice(RSTAParser.this, "fullcontext", getLine(string, startIndex)));
-                }
-
-                @Override
-                public void reportContextSensitivity(@NotNull org.antlr.v4.runtime.Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, int prediction, @NotNull ATNConfigSet configs) {
-                    parseResult.addNotice(new DefaultParserNotice(RSTAParser.this, "context", getLine(string, startIndex)));
-                }
-            });
-
+            ProblemListErrorListener errorListener = new ProblemListErrorListener();
+            parser.addErrorListener(errorListener);
 
             long time = System.currentTimeMillis();
             StructuredTextParser.StartContext context = parser.start();
 
-            parseResult.setParseTime(System.currentTimeMillis() - time);
-            parseResult.setParsedLines(1,1+getLine(string));
-            Utils.dump(context.ast);
+            parseResultListener.parseResult.setParseTime(System.currentTimeMillis() - time);
+            parseResultListener.parseResult.setParsedLines(1, 1 + getLine(string));
 
+
+            editorPane.updateProblemsTable(errorListener.problems);
+            editorPane.updateStructure(context.ast);
+
+
+            return parseResultListener.parseResult;
+            //Utils.dump(context.ast);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
 
-
-        return parseResult;
+        return new DefaultParseResult(this);
     }
 
     public static int getLine(String s, int offSet) {
@@ -104,5 +89,36 @@ public class RSTAParser implements Parser {
 
     public static int getLine(String s) {
         return getLine(s, Integer.MAX_VALUE);
+    }
+}
+
+class ParseResultListener implements ANTLRErrorListener {
+    DefaultParseResult parseResult;
+    private Parser parser;
+
+    ParseResultListener(Parser parser) {
+        this.parseResult = new DefaultParseResult(parser);
+        this.parser = parser;
+    }
+
+    @Override
+    public void syntaxError(@NotNull Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line,
+                            int charPositionInLine, @NotNull String msg, @Nullable RecognitionException e) {
+        parseResult.addNotice(new DefaultParserNotice(parser, msg, line, charPositionInLine, 5));
+    }
+
+    @Override
+    public void reportAmbiguity(@NotNull org.antlr.v4.runtime.Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, boolean exact, @Nullable BitSet ambigAlts, @NotNull ATNConfigSet configs) {
+        //parseResult.addNotice(new DefaultParserNotice(parser, "ambiguity", getLine(string, startIndex)));
+    }
+
+    @Override
+    public void reportAttemptingFullContext(@NotNull org.antlr.v4.runtime.Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, @Nullable BitSet conflictingAlts, @NotNull ATNConfigSet configs) {
+        //parseResult.addNotice(new DefaultParserNotice(parser, "fullcontext", getLine(string, startIndex)));
+    }
+
+    @Override
+    public void reportContextSensitivity(@NotNull org.antlr.v4.runtime.Parser recognizer, @NotNull DFA dfa, int startIndex, int stopIndex, int prediction, @NotNull ATNConfigSet configs) {
+        //parseResult.addNotice(new DefaultParserNotice(parser, "context", getLine(string, startIndex)));
     }
 }

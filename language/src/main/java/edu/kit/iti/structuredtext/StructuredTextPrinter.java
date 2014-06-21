@@ -377,4 +377,14 @@ public class StructuredTextPrinter implements Visitor<Object>
         }
         return null;
     }
+
+    @Override
+    public Object visit(VariableDeclaration variableDeclaration) {
+        return null;
+    }
+
+    @Override
+    public Object visit(TopLevelElement topLevelElement) {
+        return null;
+    }
 }
