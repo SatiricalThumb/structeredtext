@@ -10,6 +10,7 @@
         <module>editor</module>
         <module>language</module>
         <module>executer</module>
+        <module>plcopenxml</module>
     </modules>
 
     <name>structuredtext</name>
