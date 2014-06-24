@@ -1,11 +1,12 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitable;
 import edu.kit.iti.structuredtext.Visitor;
 
 /**
  * Created by weigl on 13.06.14.
  */
-public abstract class TypeDeclaration<T> {
+public abstract class TypeDeclaration<T> implements Visitable {
     protected String typeName;
     protected String baseTypeName;
     protected T initializationValue;

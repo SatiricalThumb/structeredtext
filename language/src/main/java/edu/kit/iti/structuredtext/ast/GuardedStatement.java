@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class GuardedStatement extends Statement {
     protected Expression condition;
-    protected StatementList statements;
+    protected StatementList statements = new StatementList();
 
     public GuardedStatement() {
 

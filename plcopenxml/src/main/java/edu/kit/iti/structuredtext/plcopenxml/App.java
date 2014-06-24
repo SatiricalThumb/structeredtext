@@ -6,7 +6,7 @@ package edu.kit.iti.structuredtext.plcopenxml;
 public class App
 {
     public static void main(String[] argv) {
-        AstBuilder builder = new AstBuilder("example.xml");
+        SFCModelBuilderCodeSys builder = new SFCModelBuilderCodeSys("Scenario0_Final.xml");
         builder.build();
     }
 

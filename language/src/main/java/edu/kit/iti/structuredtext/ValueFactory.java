@@ -150,8 +150,8 @@ public class ValueFactory {
 
 
     public static ScalarValue<EnumerateType, String> makeEnumeratedValue(String s) {
-        return null;//TODO
-
+        EnumerateType et = new EnumerateType(getPrefix(s));
+        return new ScalarValue<>(et, removePrefix(s));
     }
 
     public static ScalarValue<? extends IECString, String> parseStringLiteral(String s) {
@@ -210,7 +210,7 @@ public class ValueFactory {
         return s.substring(beginIndex);
     }
 
-    private static String getPrefix(String s) {
+    public static String getPrefix(String s) {
         int beginIndex = s.indexOf('#');
         if (beginIndex == -1)
             return null;

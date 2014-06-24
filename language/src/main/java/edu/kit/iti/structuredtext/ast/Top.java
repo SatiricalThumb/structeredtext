@@ -2,6 +2,7 @@ package edu.kit.iti.structuredtext.ast;
 
 import com.google.common.base.Strings;
 import edu.kit.iti.structuredtext.StructuredTextPrinter;
+import edu.kit.iti.structuredtext.Visitable;
 import edu.kit.iti.structuredtext.Visitor;
 
 import java.lang.reflect.AccessibleObject;
@@ -9,7 +10,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Top {
+public abstract class Top implements Visitable {
     private static void toString(Object o, Class<?> clazz, Map<String, Object> list) {
         Field f[] = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(f, true);

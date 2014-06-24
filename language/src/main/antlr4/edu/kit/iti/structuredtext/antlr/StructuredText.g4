@@ -256,7 +256,7 @@ WS                      : [ \r\t\n]+      -> channel(HIDDEN);
 COMMENT                 : '(*' ~[] '*)'  -> channel(HIDDEN);
 
 
-IDENTIFIER              : [a-zA-Z] [a-zA-Z0-9_]*;
+IDENTIFIER              : [a-zA-Z_] [$a-zA-Z0-9_]*;
 CAST_LITERAL            : IDENTIFIER '#' IDENTIFIER;
 DIRECT_VARIABLE_LITERAL: '%' [IQM] [XBWDL]? FIXED_POINT;
 
@@ -893,7 +893,7 @@ identifier_list
     ;
 
 string_var_declaration[VariableScope gather]
-    locals [ ScalarValue<? extends AnyInt,Integer> length = null, ScalarValue<? extends IECString,String> def = null ]
+    locals [ ScalarValue<? extends AnyInt,Long> length = null, ScalarValue<? extends IECString,String> def = null ]
     : identifier_list COLON type=(WSTRING|STRING)
       (LBRACKET integer {$length=$integer.ctx.ast;} RBRACKET)?
       (ASSIGN string {$def=$string.ctx.ast;} )?

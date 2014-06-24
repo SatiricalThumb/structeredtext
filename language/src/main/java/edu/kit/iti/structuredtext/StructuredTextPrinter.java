@@ -7,22 +7,25 @@ import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
 /**
  * Created by weigla on 15.06.2014.
  */
-public class StructuredTextPrinter implements Visitor<Object>
-{
+public class StructuredTextPrinter extends DefaultVisitor<Object> {
     private CodeWriter sb = new CodeWriter();
+    private boolean printComments;
+
+    public boolean isPrintComments() {
+        return printComments;
+    }
+
+    public void setPrintComments(boolean printComments) {
+        this.printComments = printComments;
+    }
+
+    @Override
+    public Object defaultVisit(Visitable visitable) {
+        throw new IllegalArgumentException("not implemented");
+    }
 
     public String getString() {
         return sb.toString();
-    }
-
-    @Override
-    public Object visit(ArrayInitialization initializations) {
-        return null;
-    }
-
-    @Override
-    public Object visit(ArrayTypeDeclaration arrayTypeDeclaration) {
-        return null;
     }
 
     @Override
@@ -31,18 +34,19 @@ public class StructuredTextPrinter implements Visitor<Object>
         return null;
     }
 
-    @Override
-    public Object visit(CaseConditions.Range range) {
-        return null;
-    }
-
-    @Override
-    public Object visit(CaseConditions.IntegerCondition integerCondition) {
-        return null;
-    }
 
     @Override
     public Object visit(CaseConditions.Enumeration enumeration) {
+        if (enumeration.getStart() == enumeration.getStop()) {
+            sb.appendIdent();
+            enumeration.getStart().visit(this);
+        } else {
+            sb.appendIdent();
+            enumeration.getStart().visit(this);
+            sb.append("..");
+            enumeration.getStop().visit(this);
+        }
+
         return null;
     }
 
@@ -135,13 +139,20 @@ public class StructuredTextPrinter implements Visitor<Object>
 
     @Override
     public Object visit(CaseStatement caseStatement) {
-        return null;
+
+        sb.nl().append("CASE ");
+        caseStatement.getExpression().visit(this);
+        sb.append(" OF ");
+
+        for(CaseStatement.Case c : caseStatement.getCases())
+        {
+            c.visit(this);
+            sb.nl();
+        }
+        sb.nl().appendIdent().append("END_CASE");
+    return null;
     }
 
-    @Override
-    public Object visit(Constant constant) {
-        return null;
-    }
 
     @Override
     public Object visit(SymbolicReference symbolicReference) {
@@ -165,14 +176,15 @@ public class StructuredTextPrinter implements Visitor<Object>
     }
 
     @Override
-    public Object visit(Reference reference) {
-        return null;
-    }
-
-    @Override
     public Object visit(StatementList statements) {
         for (Statement stmt : statements) {
-            stmt.visit(this);
+            if(stmt == null)
+            {
+                sb.append("{*ERROR: stmt null*}");
+            }
+            else {
+                stmt.visit(this);
+            }
         }
         return null;
     }
@@ -195,22 +207,19 @@ public class StructuredTextPrinter implements Visitor<Object>
     }
 
     @Override
-    public Object visit(Literal literal) {
-        return null;
-    }
-
-    @Override
     public Object visit(ExpressionList expressions) {
-        return null;
-    }
-
-    @Override
-    public Object visit(FunctionDeclaration functionDeclaration) {
+        for (Expression e : expressions) {
+            e.visit(this);
+            sb.append(", ");
+        }
+        sb.deleteLast(2);
         return null;
     }
 
     @Override
     public Object visit(FunctionCall functionCall) {
+        //TODO
+        sb.append(functionCall.getFunctionName()).append("(").append(")");
         return null;
     }
 
@@ -230,11 +239,6 @@ public class StructuredTextPrinter implements Visitor<Object>
     }
 
     @Override
-    public Object visit(ResourceDeclaration resourceDeclaration) {
-        return null;
-    }
-
-    @Override
     public Object visit(FunctionBlockDeclaration functionBlockDeclaration) {
         sb.append("FUNCTION_BLOCK ").append(functionBlockDeclaration.getFunctionBlockName()).increaseIdent();
 
@@ -249,18 +253,23 @@ public class StructuredTextPrinter implements Visitor<Object>
 
     @Override
     public Object visit(ReturnStatement returnStatement) {
+        sb.appendIdent();
+        sb.append("RETURN;");
         return null;
     }
 
     @Override
     public Object visit(FunctionBlockInvocation functionBlockInvocation) {
+        //TODO
+        sb.appendIdent();
+        sb.append(functionBlockInvocation.getFunctionName()).append("()");
         return null;
     }
 
     @Override
     public Object visit(IfStatement ifStatement) {
         for (int i = 0; i < ifStatement.getConditionalBranches().size(); i++) {
-            sb.appendIdent();
+            sb.nl();
 
             if (i == 0)
                 sb.append("IF ");
@@ -279,11 +288,6 @@ public class StructuredTextPrinter implements Visitor<Object>
             ifStatement.getElseBranch().visit(this);
         }
         sb.nl().append("END_IF;");
-        return null;
-    }
-
-    @Override
-    public Object visit(GuardedStatement guardedStatement) {
         return null;
     }
 
@@ -312,28 +316,24 @@ public class StructuredTextPrinter implements Visitor<Object>
 
     @Override
     public Object visit(CaseStatement.Case aCase) {
-        return null;
-    }
-
-    @Override
-    public Object visit(StringTypeDeclaration stringTypeDeclaration) {
-        return null;
-    }
-
-    @Override
-    public Object visit(StructureTypeDeclaration structureTypeDeclaration) {
-        return null;
-    }
-
-    @Override
-    public Object visit(SubRangeDataType subRangeDataType) {
+        sb.nl();
+        for (CaseConditions cc : aCase.getConditions()) {
+            cc.visit(this);
+            sb.append(", ");
+        }
+        sb.deleteLast(2);
+        sb.append(":");
+        sb.increaseIdent().increaseIdent();
+        sb.increaseIdent().nl();
+        aCase.getStatements().visit(this);
+        sb.decreaseIdent().decreaseIdent().decreaseIdent();
         return null;
     }
 
     @Override
     public Object visit(SimpleTypeDeclaration simpleTypeDeclaration) {
         sb.append(simpleTypeDeclaration.getBaseTypeName());
-        if(simpleTypeDeclaration.getInitializationValue() != null){
+        if (simpleTypeDeclaration.getInitializationValue() != null) {
             sb.append(" := ");
             simpleTypeDeclaration.getInitializationValue().visit(this);
         }
@@ -371,7 +371,10 @@ public class StructuredTextPrinter implements Visitor<Object>
             sb.append(" ");
 
             sb.append(vd.getName()).append(" : ");
-            vd.getDeclaredType().visit(this);
+            if (vd.getDeclaredType() != null)
+                vd.getDeclaredType().visit(this);
+            else
+                sb.append(vd.getDataType());
 
             sb.append(" END_VAR");
         }
@@ -379,12 +382,18 @@ public class StructuredTextPrinter implements Visitor<Object>
     }
 
     @Override
-    public Object visit(VariableDeclaration variableDeclaration) {
+    public Object visit(CommentStatement commentStatement){
+        if(printComments) {
+            sb.nl();
+            sb.append("{*");
+            sb.append(commentStatement.getComment());
+            sb.append("*}");
+        }
         return null;
+
     }
 
-    @Override
-    public Object visit(TopLevelElement topLevelElement) {
-        return null;
+    public void clear() {
+        sb = new CodeWriter();
     }
 }

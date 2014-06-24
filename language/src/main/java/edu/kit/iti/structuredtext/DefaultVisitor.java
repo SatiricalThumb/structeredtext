@@ -8,213 +8,223 @@ import edu.kit.iti.structuredtext.datatypes.values.ScalarValue;
  * Created by weigl on 21.06.14.
  */
 public class DefaultVisitor<T> implements Visitor<T> {
+
+    public T defaultVisit(Visitable visitable) {
+        return visitable.visit(this);
+    }
+
     @Override
     public T visit(ArrayInitialization initializations) {
-        return null;
+        return defaultVisit(initializations);
     }
 
     @Override
     public T visit(ArrayTypeDeclaration arrayTypeDeclaration) {
-        return null;
+        return defaultVisit(arrayTypeDeclaration);
     }
 
     @Override
     public T visit(AssignmentStatement assignmentStatement) {
-        return null;
+        return defaultVisit(assignmentStatement);
     }
 
     @Override
     public T visit(ExitStatement exitStatement) {
-        return null;
+        return defaultVisit(exitStatement);
     }
 
     @Override
     public T visit(CaseConditions.Range range) {
-        return null;
+        return defaultVisit(range);
     }
 
     @Override
     public T visit(CaseConditions.IntegerCondition integerCondition) {
-        return null;
+        return defaultVisit(integerCondition);
     }
 
     @Override
     public T visit(CaseConditions.Enumeration enumeration) {
-        return null;
+        return defaultVisit(enumeration);
     }
 
     @Override
     public T visit(BinaryExpression binaryExpression) {
-        return null;
+        return defaultVisit(binaryExpression);
     }
 
     @Override
     public T visit(ConfigurationDeclaration configurationDeclaration) {
-        return null;
+        return defaultVisit(configurationDeclaration);
     }
 
     @Override
     public T visit(DirectVariable directVariable) {
-        return null;
+        return defaultVisit(directVariable);
     }
 
     @Override
     public T visit(EnumerationTypeDeclaration enumerationTypeDeclaration) {
-        return null;
+        return defaultVisit(enumerationTypeDeclaration);
     }
 
     @Override
     public T visit(RepeatStatement repeatStatement) {
-        return null;
+        return defaultVisit(repeatStatement);
     }
 
     @Override
     public T visit(WhileStatement whileStatement) {
-        return null;
+        return defaultVisit(whileStatement);
     }
 
     @Override
     public T visit(UnaryExpression unaryExpression) {
-        return null;
+        return defaultVisit(unaryExpression);
     }
 
     @Override
     public T visit(TypeDeclarations typeDeclarations) {
-        return null;
+        return defaultVisit(typeDeclarations);
     }
 
     @Override
     public T visit(CaseStatement caseStatement) {
-        return null;
+        return defaultVisit(caseStatement);
     }
 
     @Override
     public T visit(Constant constant) {
-        return null;
+        return defaultVisit(constant);
     }
 
     @Override
     public T visit(SymbolicReference symbolicReference) {
-        return null;
+        return defaultVisit(symbolicReference);
     }
 
     @Override
     public T visit(Reference reference) {
-        return null;
+        return defaultVisit(reference);
     }
 
     @Override
     public T visit(StatementList statements) {
-        return null;
+        return defaultVisit(statements);
     }
 
     @Override
     public T visit(ProgramDeclaration programDeclaration) {
-        return null;
+        return defaultVisit(programDeclaration);
     }
 
     @Override
     public T visit(ScalarValue<? extends Any, ?> tsScalarValue) {
-        return null;
+        return defaultVisit(tsScalarValue);
     }
 
     @Override
     public T visit(Literal literal) {
-        return null;
+        return defaultVisit(literal);
     }
 
     @Override
     public T visit(ExpressionList expressions) {
-        return null;
+        return defaultVisit(expressions);
     }
 
     @Override
     public T visit(FunctionDeclaration functionDeclaration) {
-        return null;
+        return defaultVisit(functionDeclaration);
     }
 
     @Override
     public T visit(FunctionCall functionCall) {
-        return null;
+        return defaultVisit(functionCall);
     }
 
     @Override
     public T visit(ForStatement forStatement) {
-        return null;
+        return defaultVisit(forStatement);
     }
 
     @Override
     public T visit(ResourceDeclaration resourceDeclaration) {
-        return null;
+        return defaultVisit(resourceDeclaration);
     }
 
     @Override
     public T visit(FunctionBlockDeclaration functionBlockDeclaration) {
-        return null;
+        return defaultVisit(functionBlockDeclaration);
     }
 
     @Override
     public T visit(ReturnStatement returnStatement) {
-        return null;
+        return defaultVisit(returnStatement);
     }
 
     @Override
     public T visit(FunctionBlockInvocation functionBlockInvocation) {
-        return null;
+        return defaultVisit(functionBlockInvocation);
     }
 
     @Override
     public T visit(IfStatement ifStatement) {
-        return null;
+        return defaultVisit(ifStatement);
     }
 
     @Override
     public T visit(GuardedStatement guardedStatement) {
-        return null;
+        return defaultVisit(guardedStatement);
     }
 
     @Override
     public T visit(FunctionCallStatement functionCallStatement) {
-        return null;
+        return defaultVisit(functionCallStatement);
     }
 
     @Override
     public T visit(CaseStatement.Case aCase) {
-        return null;
+        return defaultVisit(aCase);
     }
 
     @Override
     public T visit(StringTypeDeclaration stringTypeDeclaration) {
-        return null;
+        return defaultVisit(stringTypeDeclaration);
     }
 
     @Override
     public T visit(StructureTypeDeclaration structureTypeDeclaration) {
-        return null;
+        return defaultVisit(structureTypeDeclaration);
     }
 
     @Override
     public T visit(SubRangeDataType subRangeDataType) {
-        return null;
+        return defaultVisit(subRangeDataType);
     }
 
     @Override
     public T visit(SimpleTypeDeclaration simpleTypeDeclaration) {
-        return null;
+        return defaultVisit(simpleTypeDeclaration);
     }
 
     @Override
     public T visit(VariableScope variableScope) {
-        return null;
+        return defaultVisit(variableScope);
     }
 
     @Override
     public T visit(VariableDeclaration variableDeclaration) {
-        return null;
+        return defaultVisit(variableDeclaration);
     }
 
     @Override
     public T visit(TopLevelElement topLevelElement) {
-        return null;
+        return defaultVisit(topLevelElement);
+    }
+
+    @Override
+    public T visit(CommentStatement commentStatement) {
+        return defaultVisit(commentStatement);
     }
 }

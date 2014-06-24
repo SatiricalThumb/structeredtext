@@ -11,6 +11,27 @@
 
     <artifactId>plcopenxml</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.kit.iti.structuredtext</groupId>
+            <artifactId>language</artifactId>
+            <version>0.1</version>
+        </dependency>
+
+    </dependencies>
+
     <build>
         <!-- To define the plugin version in your parent POM -->
         <pluginManagement>
@@ -38,7 +59,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <packageName>edu.kit.iti.plcopenxml.xsd</packageName> <!-- The name of your generated source package -->
+                    <packageName>edu.kit.iti.plcopenxml.xsd</packageName>
+                    <!-- The name of your generated source package -->
                 </configuration>
             </plugin>
         </plugins>

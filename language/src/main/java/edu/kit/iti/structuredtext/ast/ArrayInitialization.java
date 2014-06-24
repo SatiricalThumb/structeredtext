@@ -1,5 +1,6 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitable;
 import edu.kit.iti.structuredtext.Visitor;
 
 import java.util.*;
@@ -11,12 +12,9 @@ import java.util.stream.Stream;
 /**
  * Created by weigl on 13.06.14.
  */
-public class ArrayInitialization implements Initialization, List<Initialization> {
+public class ArrayInitialization<T> implements Initialization, List<Initialization>, Visitable {
     private List<Initialization> initValues = new ArrayList<>();
 
-    public void visit(Visitor visitor) {
-        visitor.visit(this);
-    }
 
     @Override
     public boolean add(Initialization initialization) {
@@ -176,6 +174,11 @@ public class ArrayInitialization implements Initialization, List<Initialization>
     @Override
     public <T> T[] toArray(T[] a) {
         return initValues.toArray(a);
+    }
+
+    @Override
+    public <T> T visit(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 
 }

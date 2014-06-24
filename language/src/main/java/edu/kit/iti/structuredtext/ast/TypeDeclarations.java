@@ -1,6 +1,8 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.StructuredTextPrinter;
 import edu.kit.iti.structuredtext.Visitor;
+import org.yaml.snakeyaml.TypeDescription;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -13,6 +15,15 @@ import java.util.stream.Stream;
  */
 public class TypeDeclarations extends TopLevelElement implements List<TypeDeclaration> {
     private List<TypeDeclaration> declarations = new ArrayList<>();
+
+    public TypeDeclarations() {
+    }
+
+    public TypeDeclarations(TypeDeclaration... stp) {
+        super();
+
+        declarations.addAll(Arrays.asList(stp));
+    }
 
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);

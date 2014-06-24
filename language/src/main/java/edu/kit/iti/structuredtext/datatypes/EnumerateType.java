@@ -19,6 +19,10 @@ public class EnumerateType extends Any {
         this.defValue = defValue;
     }
 
+    public EnumerateType(String prefix) {
+        this.name = prefix;
+    }
+
     public String getName() {
         return name;
     }

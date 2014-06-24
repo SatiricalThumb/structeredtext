@@ -1,5 +1,6 @@
 package edu.kit.iti.structuredtext.ast;
 
+import edu.kit.iti.structuredtext.Visitable;
 import edu.kit.iti.structuredtext.Visitor;
 import edu.kit.iti.structuredtext.datatypes.AnyInt;
 import edu.kit.iti.structuredtext.datatypes.IECString;
@@ -10,7 +11,7 @@ import java.util.*;
 /**
  * Created by weigl on 13.06.14.
  */
-public class VariableScope {
+public class VariableScope implements Visitable{
     private Map<String, VariableDeclaration> variableMap = new HashMap<>();
     private Stack<Integer> stack = new Stack<>();
 
@@ -45,7 +46,7 @@ public class VariableScope {
     }
 
 
-    private void add(VariableDeclaration var) {
+    public void add(VariableDeclaration var) {
         variableMap.put(var.getName(), var);
     }
 
@@ -94,7 +95,7 @@ public class VariableScope {
         }
     }
 
-    private int peek() {
+    public int peek() {
         try {
             return stack.peek();
         } catch (EmptyStackException e) {
@@ -113,5 +114,10 @@ public class VariableScope {
 
     public <T> T visit(Visitor<T> visitor) {
         return visitor.visit(this);
+    }
+
+    public void create(String type, String... variables)
+    {
+        create(Arrays.asList(variables), type);
     }
 }

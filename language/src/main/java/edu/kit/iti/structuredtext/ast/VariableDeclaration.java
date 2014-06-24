@@ -1,6 +1,7 @@
 package edu.kit.iti.structuredtext.ast;
 
 
+import edu.kit.iti.structuredtext.Visitable;
 import edu.kit.iti.structuredtext.Visitor;
 
 import javax.swing.tree.MutableTreeNode;
@@ -8,7 +9,7 @@ import javax.swing.tree.MutableTreeNode;
 /**
  * Created by weigla on 09.06.2014.
  */
-public class VariableDeclaration {
+public class VariableDeclaration implements Visitable {
     public static final int INPUT = 1;
     public static final int OUTPUT = 2;
     public static final int INOUT = 4;

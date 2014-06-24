@@ -95,4 +95,6 @@ public interface Visitor<T> {
     T visit(VariableDeclaration variableDeclaration);
 
     T visit(TopLevelElement topLevelElement);
+
+    T visit(CommentStatement commentStatement);
 }

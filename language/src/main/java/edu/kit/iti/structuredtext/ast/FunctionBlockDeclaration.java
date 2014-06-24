@@ -6,7 +6,7 @@ import edu.kit.iti.structuredtext.Visitor;
  * Created by weigl on 13.06.14.
  */
 public class FunctionBlockDeclaration extends TopLevelScopeElement {
-    private StatementList functionBody;
+    private StatementList functionBody = new StatementList();
     private String functionBlockName;
 
     public String getFunctionBlockName() {
