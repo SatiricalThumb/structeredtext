@@ -21,7 +21,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     @Override
     public Object defaultVisit(Visitable visitable) {
-        throw new IllegalArgumentException("not implemented");
+        throw new IllegalArgumentException("not implemented: " + visitable.getClass());
     }
 
     public String getString() {
@@ -34,6 +34,12 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visit(CaseConditions.IntegerCondition integerCondition) {
+        sb.appendIdent();
+        integerCondition.getValue().visit(this);
+        return null;
+    }
 
     @Override
     public Object visit(CaseConditions.Enumeration enumeration) {
@@ -122,7 +128,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(UnaryExpression unaryExpression) {
-        sb.append(unaryExpression.getOperator().symbol);
+        sb.append(unaryExpression.getOperator().symbol).append(" ");
         unaryExpression.getExpression().visit(this);
         return null;
     }
@@ -150,7 +156,7 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             sb.nl();
         }
         sb.nl().appendIdent().append("END_CASE");
-    return null;
+        return null;
     }
 
 
@@ -224,6 +230,21 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
     }
 
     @Override
+    public Object visit(CaseExpression caseExpression) {
+        sb.append("CASES(").increaseIdent();
+        for (CaseExpression.Case cas : caseExpression.getCases()) {
+            cas.getCondition().visit(this);
+            sb.append(" -> ");
+            cas.getExpression().visit(this);
+            sb.append(";").nl();
+        }
+        sb.append("ELSE -> ");
+        caseExpression.getElseExpression().visit(this);
+        sb.append(")").decreaseIdent();
+        return null;
+    }
+
+    @Override
     public Object visit(ForStatement forStatement) {
         sb.nl();
         sb.append("FOR ").append(forStatement.getVariable());
@@ -284,8 +305,9 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
         }
 
         if (ifStatement.getElseBranch().size() > 0) {
-            sb.append("ELSE").increaseIdent();
+            sb.nl().append("ELSE").increaseIdent();
             ifStatement.getElseBranch().visit(this);
+            sb.decreaseIdent();
         }
         sb.nl().append("END_IF;");
         return null;

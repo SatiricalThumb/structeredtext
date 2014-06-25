@@ -253,7 +253,7 @@ RANGE                   :  '..';
 
 //Ignore
 WS                      : [ \r\t\n]+      -> channel(HIDDEN);
-COMMENT                 : '(*' ~[] '*)'  -> channel(HIDDEN);
+COMMENT                 : '(*' ~[]* '*)'  -> channel(HIDDEN);
 
 
 IDENTIFIER              : [a-zA-Z_] [$a-zA-Z0-9_]*;

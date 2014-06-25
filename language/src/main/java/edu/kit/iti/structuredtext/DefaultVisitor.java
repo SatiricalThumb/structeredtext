@@ -227,4 +227,9 @@ public class DefaultVisitor<T> implements Visitor<T> {
     public T visit(CommentStatement commentStatement) {
         return defaultVisit(commentStatement);
     }
+
+    @Override
+    public T visit(CaseExpression caseExpression) {
+        return defaultVisit(caseExpression);
+    }
 }
