@@ -15,6 +15,7 @@ import edu.kit.iti.structuredtext.ast.AssignmentStatement;
 import edu.kit.iti.structuredtext.ast.BinaryExpression;
 import edu.kit.iti.structuredtext.ast.BinaryExpression.Operator;
 import edu.kit.iti.structuredtext.ast.CaseConditions;
+import edu.kit.iti.structuredtext.ast.CaseConditions.Enumeration;
 import edu.kit.iti.structuredtext.ast.CaseConditions.IntegerCondition;
 import edu.kit.iti.structuredtext.ast.CaseExpression;
 import edu.kit.iti.structuredtext.ast.CaseStatement;
@@ -106,11 +107,14 @@ public class SymbolicExecutionVisitor extends DefaultVisitor<Object> {
 
     @Override
     public Object visit(AssignmentStatement as) {
-        // Does not work for arrays!
+        Reference ref = as.getVariable();
+        assert ref instanceof SymbolicReference : "No direct variables";
+        SymbolicReference var = (SymbolicReference) ref;
+        assert var.getSubscripts().isEmpty() : "No array subscripts";
+        assert var.getSub() == null : "No sub references for now (to de done)";
 
         Expression newExpr = symbexState.eval(as.getExpression());
-        symbexState.update(toString(as.getVariable()), newExpr);
-
+        symbexState.update(var.getIdentifier(), newExpr);
         return null;
     }
 
@@ -142,7 +146,7 @@ public class SymbolicExecutionVisitor extends DefaultVisitor<Object> {
         symbexState = origState;
         Set<String> unionDomain = getUnionDomain(branchStates);
         for (String var : unionDomain) {
-            if(differs(var, branchStates)) {
+            if(differs(var, branchStates, elseState)) {
                 CaseExpression expr = new CaseExpression();
                 for (int i = 0; i < branchStates.size(); i++) {
                     Expression value = branchStates.get(i).get(var);
@@ -163,13 +167,22 @@ public class SymbolicExecutionVisitor extends DefaultVisitor<Object> {
     private Expression makeEQ(Expression cmpExpr, List<CaseConditions> conditions) {
         Expression result = null;
         for (CaseConditions cond : conditions) {
-            assert cond instanceof IntegerCondition :
-                "Sorry, only this supported right now.";
-            Expression val = ((IntegerCondition) cond).getValue();
+            Expression val = (Expression) cond.visit(this);
             Expression eq = new BinaryExpression(cmpExpr, val, Operator.EQUALS);
             result = makeOR(result, eq);
         }
         return result;
+    }
+
+    @Override
+    public Object visit(IntegerCondition integerCondition) {
+        return integerCondition.getValue();
+    }
+
+    @Override
+    public Object visit(Enumeration enumeration) {
+        assert enumeration.getStart() == enumeration.getStop();
+        return enumeration.getStart();
     }
 
     @Override
@@ -192,7 +205,7 @@ public class SymbolicExecutionVisitor extends DefaultVisitor<Object> {
         symbexState = origState;
         Set<String> unionDomain = getUnionDomain(branchStates);
         for (String var : unionDomain) {
-            if(differs(var, branchStates)) {
+            if(differs(var, branchStates, elseState)) {
                 CaseExpression expr = new CaseExpression();
                 Expression notExpr = null;
                 for (int i = 0; i < branchStates.size(); i++) {
@@ -234,7 +247,7 @@ public class SymbolicExecutionVisitor extends DefaultVisitor<Object> {
         }
     }
 
-    private static boolean differs(String var, List<SymbexState> states) {
+    private static boolean differs(String var, List<SymbexState> states, SymbexState anotherState) {
         Expression expected = null;
         for (SymbexState state : states) {
             if(expected == null) {
@@ -244,6 +257,9 @@ public class SymbolicExecutionVisitor extends DefaultVisitor<Object> {
                     return true;
                 }
             }
+        }
+        if(expected != null && !expected.equals(anotherState.get(var))) {
+            return true;
         }
         return false;
     }

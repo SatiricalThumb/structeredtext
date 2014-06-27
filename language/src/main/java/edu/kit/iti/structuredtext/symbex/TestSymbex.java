@@ -9,6 +9,7 @@ import edu.kit.iti.structuredtext.antlr.StructuredTextLexer;
 import edu.kit.iti.structuredtext.antlr.StructuredTextParser;
 import edu.kit.iti.structuredtext.antlr.StructuredTextParser.StartContext;
 import edu.kit.iti.structuredtext.ast.Top;
+import edu.kit.iti.structuredtext.translation.smv.SMVTranslationVisitor;
 
 public class TestSymbex {
 
@@ -27,14 +28,18 @@ public class TestSymbex {
         StructuredTextPrinter printer = new StructuredTextPrinter();
         for (Top elem : pt.ast) {
             elem.visit(printer);
-            System.out.println(printer.getString());
+//            System.out.println(printer.getString());
 
             SymbolicExecutionVisitor symbex = new SymbolicExecutionVisitor();
             Visitable newElem = (Visitable) elem.visit(symbex);
 
             printer.clear();
             newElem.visit(printer);
-            System.out.println(printer.getString());
+//            System.out.println(printer.getString());
+
+            SMVTranslationVisitor smv = new SMVTranslationVisitor();
+            newElem.visit(smv);
+            System.out.println(smv.getModule());
         }
     }
 

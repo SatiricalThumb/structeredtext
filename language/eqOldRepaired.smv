@@ -1,0 +1,49 @@
+MODULE main
+VAR
+ error1 : boolean;
+ state1 : {S0, S1, S2, S3};
+ B1 : boolean;
+ B2 : boolean;
+ L2 : boolean;
+ state2 : {S0, S1, S2, S3};
+ error2 : boolean;
+
+ sw0: boolean;
+ sw1: boolean;
+ sw2: boolean;
+
+ASSIGN
+  init(error1) := FALSE;
+
+  init(state1) := S0;
+
+  init(B1) := FALSE;
+
+  next(error1) := FALSE;
+
+  next(state1) := case (state1 = S0) : case (sw0 & ! sw2) : S1;  TRUE : state1; esac; (state1 = S1) : case sw2 : S0;  TRUE : state1; esac;  TRUE : state1; esac;
+
+  next(B1) := case (state1 = S0) : FALSE; (state1 = S1) : TRUE;  TRUE : B1; esac;
+
+  init(B2) := FALSE;
+
+  init(L2) := FALSE;
+
+  init(state2) := S0;
+
+  init(error2) := FALSE;
+
+  next(B2) := case (state2 = S0) : FALSE; (state2 = S1) : TRUE; (state2 = S2) : TRUE; (state2 = S3) : FALSE;  TRUE : B2; esac;
+
+  next(state2) := case (state2 = S0) : case (sw0 & ! sw2) : S1;  TRUE : state2; esac; (state2 = S1) : case sw2 : S0; (! sw2 & sw1) : S2;  TRUE : state2; esac; (state2 = S2) : case sw2 : S3;  TRUE : state2; esac; (state2 = S3) : case ! sw2 : case sw0 : S1;  TRUE : S0; esac;  TRUE : state2; esac;  TRUE : state2; esac;
+
+  next(L2) := case (state2 = S0) : FALSE; (state2 = S1) : FALSE; (state2 = S2) : TRUE; (state2 = S3) : TRUE;  TRUE : L2; esac;
+
+  next(error2) := FALSE;
+
+
+SPEC
+  AG !error1 & !error2
+
+SPEC
+  AG B1 = B2 

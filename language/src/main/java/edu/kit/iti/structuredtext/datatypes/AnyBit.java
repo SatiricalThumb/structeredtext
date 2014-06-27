@@ -48,7 +48,7 @@ public abstract class AnyBit extends Any {
                 if ((Boolean) obj)
                     return "TRUE";
             }
-            return "false";
+            return "FALSE";
         }
     }
 

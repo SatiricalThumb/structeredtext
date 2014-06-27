@@ -1,0 +1,21 @@
+MODULE main
+VAR
+ error : boolean;
+ state1 : {S0, S1, S2, S3};
+ B1 : boolean;
+
+ASSIGN
+  init(error) := FALSE;
+
+  init(state1) := S0;
+
+  init(B1) := FALSE;
+
+  next(error) := FALSE;
+
+  next(state1) := case (state1 = S0) : S1; (state1 = S1) : S0;  TRUE : state1; esac;
+
+  next(B1) := case (state1 = S0) : TRUE; (state1 = S1) : FALSE;  TRUE : B1; esac;
+
+SPEC
+  AG ! error;

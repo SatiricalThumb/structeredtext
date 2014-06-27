@@ -155,6 +155,8 @@ public class StructuredTextPrinter extends DefaultVisitor<Object> {
             c.visit(this);
             sb.nl();
         }
+        sb.nl().append("ELSE ");
+        caseStatement.getElseCase().visit(this);
         sb.nl().appendIdent().append("END_CASE");
         return null;
     }
